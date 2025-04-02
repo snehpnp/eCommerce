@@ -1,6 +1,8 @@
 "use strict";
 
-const Product = require("../models/product");
+const path = require('path');
+const Product = require(path.resolve(__dirname, '../models/product'));
+
 
 class ProductController {
   // Create a new product
