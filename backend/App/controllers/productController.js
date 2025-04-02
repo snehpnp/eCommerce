@@ -1,3 +1,5 @@
+"use strict";
+
 const Product = require("../models/product");
 
 class ProductController {
