@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Instagram, Facebook } from "lucide-react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import Logo from "../../assets/logo-removebg-preview.png";
+import Logo from "../../assets/logo-removebg-preview.png"
 
-const AuthPage = () => {
+const SignUpPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    name: "",
     email: localStorage.getItem("email") || "",
     password: "",
+    confirmPassword: "",
   });
 
   useEffect(() => {
@@ -20,31 +23,46 @@ const AuthPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Logging in...");
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+    console.log("Signing up...", formData);
     navigate("/dashboard");
   };
 
   return (
-    <div
-      className="container"
-      style={{ minHeight: "100vh", marginTop: "10vh" }}
-    >
-      <div className="text-center my-4">
-        <img src={Logo} alt="Website Logo" style={{ maxWidth: "150px" }} />
-      </div>
+    <div className="container" style={{ minHeight: "100vh",marginTop:"10vh" }}>
 
+<div className="text-center my-4">
+    <img
+      src={Logo}
+      alt="Website Logo"
+      style={{ maxWidth: "150px" }}
+    />
+  </div>
       <div className="row m-5 no-gutters shadow-lg">
         <div className="col-md-6 d-none d-md-block">
           <img
-            src="https://images.unsplash.com/photo-1566888596782-c7f41cc184c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=2134&q=80"
+            src="https://images.unsplash.com/photo-1521790797524-b2497295b8a0"
             className="img-fluid"
-            style={{ maxHeight: "40vh", objectFit: "cover", width: "100%" }}
-            alt="Auth Banner"
+            style={{ maxHeight: "70vh", objectFit: "cover" }}
+            alt="Sign Up Banner"
           />
         </div>
         <div className="col-md-6 bg-white p-5">
-          <h3 className="pb-3">Login</h3>
+          <h3 className="pb-3">Sign Up</h3>
           <form onSubmit={handleSubmit}>
+            <div className="form-group pb-3">
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                className="form-control"
+                onChange={handleChange}
+                required
+              />
+            </div>
             <div className="form-group pb-3">
               <input
                 type="email"
@@ -66,20 +84,29 @@ const AuthPage = () => {
                 required
               />
             </div>
-            <div className="d-flex justify-content-between pb-2">
-              <a onClick={() => navigate("/forgotpassword")}>
-                Forgot Password?
-              </a>
+            <div className="form-group pb-3">
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                className="form-control"
+                onChange={handleChange}
+                required
+              />
             </div>
-            <button
-              type="submit"
-              className="btn btn-dark w-100 font-weight-bold mt-2"
-            >
-              Login
-            </button>
+            <div className="pb-2">
+              <button
+                type="submit"
+                className="btn btn-dark w-100 font-weight-bold mt-2"
+              >
+                Sign Up
+              </button>
+            </div>
           </form>
 
           <div className="sideline">OR</div>
+
+          {/* Social Login Icons */}
           <div className="d-flex gap-3 justify-content-center">
             <i
               className="fa-brands fa-facebook"
@@ -91,15 +118,17 @@ const AuthPage = () => {
             ></i>
             <i
               className="fa-brands fa-snapchat"
-              style={{ fontSize: "32px", color: "#FFFC00" }}
+              style={{ fontSize: "32px", color: "yellow" }}
             ></i>
             <i
               className="fa-brands fa-google"
               style={{ fontSize: "32px", color: "#DB4437" }}
             ></i>
           </div>
+
           <div className="pt-4 text-center">
-            New here? <a onClick={() => navigate("/signup")}>Sign Up</a>
+            Already have an account?{" "}
+            <a onClick={() => navigate("/login")}>Login</a>
           </div>
         </div>
       </div>
@@ -107,4 +136,4 @@ const AuthPage = () => {
   );
 };
 
-export default AuthPage;
+export default SignUpPage;
