@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Logo from "../../assets/logo-removebg-preview.png";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../../utils/firebase-config";
+import { auth ,facebookProvider} from "../../utils/firebase-config";
 import axios from "axios";
 import * as config from "../../utils/Config";
 const AuthPage = () => {
@@ -39,6 +39,7 @@ const AuthPage = () => {
       });
   };
 
+  // Google Login
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
@@ -60,6 +61,29 @@ const AuthPage = () => {
       }
     } catch (error) {
       console.error("Error:", error);
+    }
+  };
+
+  // Facebook Login
+  const handleFacebookLogin = async () => {
+    try {
+      // Close any existing popup request before opening a new one
+      auth.currentUser && auth.signOut();
+  
+      const result = await signInWithPopup(auth, facebookProvider);
+      const token = await result.user.getIdToken(); // Get Firebase token
+  
+      console.log("Facebook User Data:", result.user);
+  
+      // Send token to backend
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/facebook-auth",
+        { token }
+      );
+  
+      console.log("Backend Response:", response.data);
+    } catch (error) {
+      console.error("Facebook Login Error:", error);
     }
   };
 
@@ -123,6 +147,7 @@ const AuthPage = () => {
             <i
               className="fa-brands fa-facebook"
               style={{ fontSize: "32px", color: "#4267B2" }}
+              onClick={handleFacebookLogin}
             ></i>
             <i
               className="fa-brands fa-instagram"

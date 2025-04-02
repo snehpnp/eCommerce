@@ -10,6 +10,7 @@ router.post("/login", (req, res) => AuthController.login(req, res));
 router.post("/google-auth", (req, res) => AuthController.googleAuth(req, res));
 router.post("/instagram-auth", (req, res) => AuthController.instagramAuth(req, res));
 router.post("/snapchat-auth", (req, res) => AuthController.snapchatAuth(req, res));
+router.post("/facebook-auth", (req, res) => AuthController.facebookAuth(req, res));
 
 router.get("/get-profile", (req, res) => AuthController.GetProfilePhoto(req, res));
 
