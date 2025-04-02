@@ -31,10 +31,7 @@ const AuthPage = () => {
     axios
       .post(config.react_domain + "/api/auth/login", data)
       .then((response) => {
-        console.log("Login Success:", response.data);
-       
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
         navigate("/");
       })
       .catch((error) => {
@@ -50,11 +47,17 @@ const AuthPage = () => {
 
       // Send token to backend
       const response = await axios.post(
-        "http://localhost:5000/api/auth/google-auth",
+        config.react_domain + "/api/auth/google-auth",
         { token }
       );
-
-      console.log("User Data:", response.data.user);
+      console.log("Login successful:", response.data);
+      if (response.data.status) {
+        localStorage.setItem("token", response.data.token); // Store token in local storage
+        navigate("/"); // Redirect to home page
+      } else {
+        console.error("Login failed:", response.data.message);
+        alert(response.data.message);
+      }
     } catch (error) {
       console.error("Error:", error);
     }

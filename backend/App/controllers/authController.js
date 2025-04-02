@@ -122,9 +122,6 @@ class AuthController {
       const salt = await bcrypt.genSalt(10);
       var hashedPassword = await bcrypt.hash(password.toString(), salt);
 
-      console.log("password", password);
-      console.log("hashedPassword", hashedPassword);
-
       // ✅ Create New User
       user = new User({
         name,
@@ -279,7 +276,10 @@ class AuthController {
       }
 
       // ✅ Fix async issue (await is required)
-      const isMatch =  bcrypt.compare(password.toString(), user.password.toString());
+      const isMatch = bcrypt.compare(
+        password.toString(),
+        user.password.toString()
+      );
 
       if (!isMatch) {
         return res.status(400).json({ message: "Invalid email or password" });
@@ -289,9 +289,14 @@ class AuthController {
         return res.status(400).json({ message: "User not verified" });
       }
 
+      let GetRole = await Role.findById(user.role);
+      if (!GetRole) {
+        return res.status(400).json({ message: "Role not found" });
+      }
+
       // ✅ Generate JWT Token (7 Days Expiry)
       const token = jwt.sign(
-        { id: user._id, role: user.role },
+        { id: user._id, role: GetRole.name },
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
       );
@@ -308,12 +313,51 @@ class AuthController {
     try {
       const { token } = req.body;
 
+      if (!token) {
+        return res.status(400).json({ message: "Token is required" });
+      }
+
       // Verify Firebase Token
       const decodedToken = await admin.auth().verifyIdToken(token);
       const { uid, name, email, picture } = decodedToken;
+
       console.log("Decoded Token:", decodedToken);
+
+      // Check if user exists in DB
+      let user = await User.findOne({ email });
+
+      if (!user) {
+        // Create new user
+        user = new User({
+          uid,
+          name,
+          email,
+          profilePic: picture,
+          isVerified: true,
+          authType: "google",
+        });
+        await user.save();
+      }
+
+      // Generate JWT for session management
+      const jwtToken = jwt.sign(
+        { id: user._id, role: "USER" },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
+
+      res
+        .status(200)
+        .json({
+          message: "Google Auth Successful",
+          token: jwtToken,
+          status: true,
+        });
     } catch (error) {
-      res.status(500).json({ message: "Google authentication failed", error });
+      console.error("Google Auth Error:", error);
+      res.status(401).json({ message: "Google authentication failed", error });
     }
   }
 
@@ -386,7 +430,7 @@ class AuthController {
   }
 
   // 📍 Role-based Access Middleware
-  static authMiddleware(roles) {
+  async authMiddleware(roles) {
     return (req, res, next) => {
       const token = req.header("Authorization");
       if (!token) return res.status(401).json({ message: "Access denied" });
@@ -402,6 +446,29 @@ class AuthController {
         res.status(400).json({ message: "Invalid token" });
       }
     };
+  }
+
+  async GetProfilePhoto(req, res) {
+    try {
+      const token = req.header("Authorization");
+      if (!token) return res.status(401).json({ message: "Access denied" });
+
+      console.log("Token:", token);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("Decoded Token:", decoded);
+
+      let UserFind = await User.findOne({_id: decoded.id }).select("profilePic")
+      if (!UserFind) return res.status(400).json({ message: "User not found" });
+
+
+return res.send({status: true, data: UserFind.profilePic, message: "Profile photo fetched successfully"});
+
+
+
+
+    } catch (error) {
+      console.log("Error in GetProfilePhoto", error);
+    }
   }
 }
 

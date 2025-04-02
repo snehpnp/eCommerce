@@ -49,7 +49,7 @@ function Shop({ name }) {
     try {
       const response = await axios.get(`${Config.react_domain}/api/products`);
       const data = response.data;
-      console.log(data);
+   
       setProducts(data);
     } catch (error) {
       console.error("Error fetching products:", error);

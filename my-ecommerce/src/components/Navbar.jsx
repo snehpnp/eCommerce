@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   AppBar,
@@ -25,6 +25,8 @@ import {
 } from "@mui/icons-material";
 import { styled, useTheme } from "@mui/material/styles";
 import Logo from "../assets/logo-removebg-preview.png";
+import * as config from "../utils/Config";
+import axios from "axios";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -56,6 +58,8 @@ export default function ResponsiveNavbar() {
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
+  const [getProfileLogo , setGetProfileLogo] = useState(null);
+
   const navLinks = [
     { name: "Sheet Sets", path: "/sheet-sets" },
     { name: "Fitted Sheets", path: "/fitted-sheets" },
@@ -63,6 +67,38 @@ export default function ResponsiveNavbar() {
     { name: "Pillow Cases", path: "/pillow-cases" },
     { name: "Bed Covers", path: "/bed-covers" },
   ];
+
+  const Logout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/#/login"; // Redirect to login page after logout
+  };
+
+    useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios
+        .get(`${config.react_domain}/api/auth/get-profile`, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        })
+        .then((response) => {
+          console.log("Profile data:", response.data);
+          if(response.data.status) {
+            setGetProfileLogo(response.data.data);
+          }
+          else {
+            console.error("Failed to fetch profile data:", response.data.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching profile data:", error);
+        });
+    }
+  }, []);
+
+
+  console.log("Profile Logo:222", getProfileLogo);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -117,7 +153,19 @@ export default function ResponsiveNavbar() {
           </Box>
 
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            <AccountCircle fontSize="large" />
+            {getProfileLogo ? (
+              <img
+                src={getProfileLogo}
+                alt="Profile"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                }}
+              />
+            ) : (
+              <AccountCircle fontSize="large" />
+            )}
           </IconButton>
 
           <Menu
@@ -127,7 +175,7 @@ export default function ResponsiveNavbar() {
           >
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+            <MenuItem onClick={() => Logout()}>Logout</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
