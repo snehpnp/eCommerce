@@ -24,7 +24,7 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import { styled, useTheme } from "@mui/material/styles";
-import Logo from "../assets/logo.jpg";
+import Logo from "../assets/logo-removebg-preview.png";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -74,38 +74,57 @@ export default function ResponsiveNavbar() {
             </IconButton>
           )}
 
-          <Box sx={{ flexGrow: 1, display: "flex", alignItems: "start" }}>
-            <Link to="/" style={{ textDecoration: "none" }}>
-              <img src={Logo} alt="Logo" style={{ width: "250px", height: "81px", maxHeight: "81px" }} />
-            </Link>
+          <Box
+            sx={{
+              mr: 2,
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+            }}
+          >
+            <img
+              src={Logo}
+              alt="Logo"
+              style={{
+                width: "250px",
+                height: "81px",
+                maxHeight: "81px",
+                paddingLeft: 0,
+              }}
+            />
           </Box>
-       
+
           <Box sx={{ flexGrow: 25, display: "flex", alignItems: "start" }}>
-          <Search>
-            <SearchIcon />
-            <StyledInputBase placeholder="Search…" inputProps={{ "aria-label": "search" }} />
-          </Search>
+            <Search>
+              <SearchIcon />
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ "aria-label": "search" }}
+              />
+            </Search>
           </Box>
 
           <Box sx={{ flexGrow: 1, display: "flex", alignItems: "end" }}>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
-              <MailIcon fontSize="large" />
-            </Badge>
-          </IconButton>
-          <IconButton color="inherit">
-            <Badge badgeContent={10} color="error">
-              <NotificationsIcon fontSize="large" />
-            </Badge>
-          </IconButton>
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="error">
+                <MailIcon fontSize="large" />
+              </Badge>
+            </IconButton>
+            <IconButton color="inherit">
+              <Badge badgeContent={10} color="error">
+                <NotificationsIcon fontSize="large" />
+              </Badge>
+            </IconButton>
           </Box>
-        
+
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <AccountCircle fontSize="large" />
           </IconButton>
 
-        
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
             <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
@@ -113,10 +132,36 @@ export default function ResponsiveNavbar() {
         </Toolbar>
       </AppBar>
 
-      <Drawer anchor="left" open={mobileOpen} onClose={toggleDrawer}>
-        <List>
+      <Drawer
+        anchor="left"
+        open={mobileOpen}
+        onClose={toggleDrawer}
+        style={{ width: "250px" }} // Drawer width fixed
+      >
+        <List style={{ padding: "10px 15px" }}>
           {navLinks.map(({ name, path }) => (
-            <ListItem button key={name} onClick={toggleDrawer} component={Link} to={path}>
+            <ListItem
+              button
+              key={name}
+              onClick={toggleDrawer}
+              component={Link}
+              to={path}
+              style={{
+                textDecoration: "none",
+                color: "#333",
+                padding: "12px 15px",
+                fontSize: "16px",
+                fontWeight: "500",
+                borderBottom: "1px solid #ddd", // Light separator for menu items
+                transition: "background 0.3s",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#f0f0f0")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "transparent")
+              }
+            >
               <ListItemText primary={name} />
             </ListItem>
           ))}
@@ -124,10 +169,37 @@ export default function ResponsiveNavbar() {
       </Drawer>
 
       {!isMobile && (
-        <Box sx={{ display: "flex", justifyContent: "left", bgcolor: "#eee", p: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "left",
+            alignItems: "center",
+            bgcolor: "#f8f8f8", // Light gray background
+            p: 2,
+            boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)", // Light shadow for depth
+          }}
+        >
           {navLinks.map(({ name, path }) => (
-            <Typography key={name} sx={{ mx: 2, cursor: "pointer", fontWeight: "bold" }}>
-              <Link to={path} style={{ textDecoration: "none", color: "black" }}>
+            <Typography
+              key={name}
+              sx={{
+                mx: 2,
+                cursor: "pointer",
+                fontWeight: "bold",
+                fontSize: "16px",
+                padding: "8px 12px",
+                borderRadius: "5px",
+                transition: "background 0.3s, color 0.3s",
+                "&:hover": {
+                  background: "#ddd", // Light gray on hover
+                  color: "#000",
+                },
+              }}
+            >
+              <Link
+                to={path}
+                style={{ textDecoration: "none", color: "black" }}
+              >
                 {name}
               </Link>
             </Typography>

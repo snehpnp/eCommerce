@@ -1,0 +1,1 @@
+export const react_domain = `http://localhost:5000`;

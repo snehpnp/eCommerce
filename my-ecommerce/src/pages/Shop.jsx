@@ -4,6 +4,8 @@ import img1 from "../assets/Images/Bed Skirt.jpg";
 import img2 from "../assets/Images/Both.jpg";
 import img3 from "../assets/Images/Comforter Sets.jpg";
 import img4 from "../assets/Images/dex-ezekiel-rYPW3gKsbYc-unsplash.jpg";
+import axios from "axios";
+import * as Config from "../utils/Config";
 
 const cachedProducts = [
   {
@@ -40,40 +42,72 @@ const cachedProducts = [
   },
 ];
 
-function Shop({name}) {
+function Shop({ name }) {
   const [products, setProducts] = useState([]);
 
-
+  const GetProducts = async () => {
+    try {
+      const response = await axios.get(`${Config.react_domain}/api/products`);
+      const data = response.data;
+      console.log(data);
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts(cachedProducts); // Fallback to cached products in case of error
+    }
+  };
   useEffect(() => {
-    // Cache se products load kar rahe hain
-    setProducts(cachedProducts);
+    const fetchProducts = async () => {
+      await GetProducts();
+    };
+    fetchProducts();
   }, []);
 
   return (
-    <div className="container-fluid" style={{ marginTop: "70px", marginBottom: "50px" }}>
-      <h4 style={{ textAlign: "center" ,marginBottom: "30px"}}>
+    <div
+      className="container-fluid"
+      style={{ marginTop: "70px", marginBottom: "50px" }}
+    >
+      <h4 style={{ textAlign: "center", marginBottom: "30px" }}>
         <strong>{name}</strong>
       </h4>
       <main className="main bd-grid">
         {products.map((product) => (
           <article className="card" key={product.id}>
             <div className="card__img">
-              <img src={product.image} alt={product.name} className="card__img" />
+              <img
+                src={product.mainImage}
+                alt={product.name}
+                className="card__img"
+              />
             </div>
             <div className="card__name">
               <p>{product.name}</p>
             </div>
             <div className="card__precis">
-              <FaHeart className="icon" style={{ color: "red", cursor: "pointer" }} />
+              <FaHeart
+                className="icon"
+                style={{ color: "red", cursor: "pointer" }}
+              />
               <div>
-                <span className="card__preci card__preci--before" style={{ textDecoration: "line-through", color: "gray" }}>
-                  ${product.oldPrice.toFixed(2)}
+                <span
+                  className="card__preci card__preci--before"
+                  style={{ textDecoration: "line-through", color: "gray" }}
+                >
+                  ${product.price.toFixed(2) - 100}
                 </span>
-                <span className="card__preci card__preci--now" style={{ color: "red", fontWeight: "bold" }}>
-                  ${product.newPrice.toFixed(2)}
+                <span
+                  className="card__preci card__preci--now"
+                  style={{ color: "red", fontWeight: "bold" }}
+                >
+                  ${product.price.toFixed(2)}
                 </span>
               </div>
-              <FaShoppingCart className="icon" style={{ color: "green", cursor: "pointer" }} />
+              <div className="card__name">{product.name}</div>
+              <FaShoppingCart
+                className="icon"
+                style={{ color: "green", cursor: "pointer" }}
+              />
             </div>
 
             {/* {product.offer && (

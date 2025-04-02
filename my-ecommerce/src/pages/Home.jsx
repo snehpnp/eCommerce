@@ -9,7 +9,7 @@ const Home = () => {
     <>
       <div className="container-fluid" style={{ padding: "0", margin: "0" }}>
         <img 
-          src={HomeImg} 
+          src={"https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510683/Haven_fcusgq.jpg"} 
           alt="Home" 
           className="home-img" 
           style={{
@@ -24,14 +24,14 @@ const Home = () => {
 
 <HomeCarousel />
 
-        <Shop name={"Fitted Bedsheets"} />
+        {/* <Shop name={"Fitted Bedsheets"} />
         <Shop name={"Pillow Cases"} />
         <Shop name={"Bed Covers"} />
         <Shop name={"Sheet Sets"} />
         <Shop name={"Comforter Sets"} />
         <Shop name={"Bed Skirts"} />
         
-        <Shop name={"Premium Comforter"} />
+        <Shop name={"Premium Comforter"} /> */}
       </div>
     </>
   );
