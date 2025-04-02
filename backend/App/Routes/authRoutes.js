@@ -4,6 +4,8 @@ const AuthController = require("../Controllers/authController");
 
 
 router.post("/register", (req, res) => AuthController.register(req, res));
+router.get("/verify-otp", (req, res) => AuthController.verifyOTP(req, res));
+router.post("/send-otp", (req, res) => AuthController.sendOTP(req, res));
 router.post("/login", (req, res) => AuthController.login(req, res));
 router.post("/google-auth", (req, res) => AuthController.googleAuth(req, res));
 router.post("/instagram-auth", (req, res) => AuthController.instagramAuth(req, res));

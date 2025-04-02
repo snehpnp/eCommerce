@@ -37,6 +37,7 @@ app.use(passport.session());
 
 // Routes
 app.use("/api", productRoutes);
+app.use("/api/auth", require("./App/Routes/authRoutes")); // Auth routes
 
 // Global Error Handler (Catches All Errors)
 app.use((err, req, res, next) => {

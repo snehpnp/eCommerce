@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Logo from "../../assets/logo-removebg-preview.png";
-
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../utils/firebase-config";
+import axios from "axios";
+import * as config from "../../utils/Config";
 const AuthPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -20,8 +23,41 @@ const AuthPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Logging in...");
-    navigate("/dashboard");
+    console.log("Logging in...", formData);
+    let data = {
+      email: formData.email,
+      password: formData.password,
+    };
+    axios
+      .post(config.react_domain + "/api/auth/login", data)
+      .then((response) => {
+        console.log("Login Success:", response.data);
+       
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Login Error:", error.response.data.message);
+      });
+  };
+
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken(); // Get Firebase token
+
+      // Send token to backend
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/google-auth",
+        { token }
+      );
+
+      console.log("User Data:", response.data.user);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -96,6 +132,7 @@ const AuthPage = () => {
             <i
               className="fa-brands fa-google"
               style={{ fontSize: "32px", color: "#DB4437" }}
+              onClick={handleGoogleLogin}
             ></i>
           </div>
           <div className="pt-4 text-center">

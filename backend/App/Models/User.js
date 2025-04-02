@@ -15,10 +15,42 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
     },
+    otp: {
+      type: String,
+    },
+    otpExpires: { type: Date },
+    otp1: {
+      type: String,
+    },
     authType: {
       type: String,
       enum: ["local", "google", "instagram", "snapchat"],
       default: "local",
+    },
+    profilePic: {
+      type: String, // URL of profile picture
+      default: "",
+    },
+    sessionToken: {
+      type: String, // Store session token for authentication
+    },
+    lastLogin: {
+      type: Date, // Store last login timestamp
+      default: Date.now,
+    },
+    wallet: {
+      amount: {
+        type: Number,
+        default: 0, // Default wallet balance
+      },
+      currency: {
+        type: String,
+        default: "USD", // Default currency
+      },
+    },
+    isVerified: {
+      type: Boolean,
+      default: false, // Default verification status
     },
     role: {
       type: mongoose.Schema.Types.ObjectId,
@@ -36,5 +68,4 @@ UserSchema.pre("save", async function (next) {
 });
 
 const User = mongoose.model("User", UserSchema);
-
 module.exports = User;
