@@ -470,6 +470,55 @@ return res.send({status: true, data: UserFind.profilePic, message: "Profile phot
       console.log("Error in GetProfilePhoto", error);
     }
   }
+
+
+  async facebookcallback(req, res) {
+    try{
+      const { accessToken } = req.body;
+      console.log("Access Token:", req.body);
+      if (!accessToken) {
+        return res.status(400).json({ message: "Invalid access token" });
+      }
+
+      // Verify Facebook Token
+      const decodedToken = await admin.auth().verifyIdToken(accessToken);
+      const { uid, name, email, picture } = decodedToken;
+
+      // Check if user exists in DB
+      let user = await User.findOne({ email });
+
+      if (!user) {
+        // Create new user
+        user = new User({
+          uid,
+          name,
+          email,
+          profilePic: picture,
+          isVerified: true,
+          authType: "facebook",
+        });
+        await user.save();
+      }
+
+      // Generate JWT for session management
+      const jwtToken = jwt.sign(
+        { id: user._id, role: "USER" },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
+
+      res.status(200).json({
+        message: "Facebook Auth Successful",
+        token: jwtToken,
+        status: true,
+      });
+
+    }catch(error){
+      console.log("Error in facebookcallback", error);
+    }
+  }
 }
 
 module.exports = new AuthController();
