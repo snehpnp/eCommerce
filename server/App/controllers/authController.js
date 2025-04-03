@@ -285,7 +285,7 @@ class AuthController {
         return res.status(400).json({ message: "Invalid email or password" });
       }
 
-      if (!user.isVerified) {
+      if (!user.isVerified ) {
         return res.status(400).json({ message: "User not verified" });
       }
 
