@@ -8,7 +8,6 @@ import axios from "axios";
 import * as config from "../../utils/Config";
 import { ToastContainer, toast } from "react-toastify";
 
-import { Button } from "react-bootstrap";
 
 const AuthPage = () => {
   const navigate = useNavigate();

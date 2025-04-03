@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Instagram, Facebook } from "lucide-react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import Logo from "../../assets/logo-removebg-preview.png"
+import Logo from "../../assets/logo-removebg-preview.png";
+import { ToastContainer, toast } from "react-toastify";
+import * as config from "../../utils/Config";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -27,19 +29,41 @@ const SignUpPage = () => {
       alert("Passwords do not match!");
       return;
     }
-    navigate("/dashboard");
-  };
+
+    let Req = {
+      
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: "USER"
+    }
+
+    axios
+      .post("https://example.com/api/auth/signup", Req)
+      .then((response) => {
+        if (response.data.status) {
+          toast.success(response.data.message);
+          navigate("/login");
+        } else {
+          toast.error(response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error during signup:", error);
+        toast.error("An error occurred during signup. Please try again.");
+      });
+
+    };
+  
 
   return (
-    <div className="container" style={{ minHeight: "100vh",marginTop:"10vh" }}>
-
-<div className="text-center my-4">
-    <img
-      src={Logo}
-      alt="Website Logo"
-      style={{ maxWidth: "150px" }}
-    />
-  </div>
+    <div
+      className="container"
+      style={{ minHeight: "100vh", marginTop: "10vh" }}
+    >
+      <div className="text-center my-4">
+        <img src={Logo} alt="Website Logo" style={{ maxWidth: "150px" }} />
+      </div>
       <div className="row m-5 no-gutters shadow-lg">
         <div className="col-md-6 d-none d-md-block">
           <img
@@ -131,6 +155,11 @@ const SignUpPage = () => {
           </div>
         </div>
       </div>
+
+      <div className="grid place-items-center h-dvh bg-zinc-900/15">
+        <ToastContainer />
+      </div>
+
     </div>
   );
 };
