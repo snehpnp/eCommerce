@@ -21,8 +21,7 @@ function App() {
           localStorage.removeItem("token");
           navigate("/login");
         } else {
-          console.log("Token is valid", decoded);
-          console.log("Current Path:", location.pathname);
+       
 
           // Agar user restricted route par hai aur token valid hai toh home page bhejo
           if (

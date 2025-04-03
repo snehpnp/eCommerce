@@ -83,7 +83,6 @@ export default function ResponsiveNavbar() {
           },
         })
         .then((response) => {
-          console.log("Profile data:", response.data);
           if(response.data.status) {
             setGetProfileLogo(response.data.data);
           }
@@ -98,7 +97,6 @@ export default function ResponsiveNavbar() {
   }, []);
 
 
-  console.log("Profile Logo:222", getProfileLogo);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

@@ -27,7 +27,6 @@ const SignUpPage = () => {
       alert("Passwords do not match!");
       return;
     }
-    console.log("Signing up...", formData);
     navigate("/dashboard");
   };
 

@@ -83,7 +83,6 @@ const AddProduct = () => {
           'Content-Type': 'application/json',
         },
       });
-      console.log(response.data);
       alert('Product added successfully');
     } catch (error) {
       console.error('Error adding product:', error);

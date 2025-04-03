@@ -23,17 +23,15 @@ class AuthController {
 
       // ✅ Basic Validations
       if (!name || !email || !password || !role)
-        return res.status(400).json({ message: "All fields are required" });
+        return res.json({ message: "All fields are required" });
       if (password.length < 6)
-        return res
-          .status(400)
-          .json({ message: "Password must be at least 6 characters" });
+        return res.json({ message: "Password must be at least 6 characters" });
       if (!email.includes("@"))
-        return res.status(400).json({ message: "Invalid email format" });
+        return res.json({ message: "Invalid email format" });
 
       // ✅ Check Role Exists
       const findRole = await Role.findOne({ name: role });
-      if (!findRole) return res.status(400).json({ message: "Role not found" });
+      if (!findRole) return res.json({ message: "Role not found" });
 
       // ✅ Check if User Exists
       let user1 = await User.findOne({ email, isVerified: true });
@@ -41,7 +39,7 @@ class AuthController {
       if (user1) {
         // If user exists, check if already verified
         if (user1.isVerified) {
-          return res.status(400).json({ message: "User already registered" });
+          return res.json({ message: "User already registered" });
         }
       }
 
@@ -204,24 +202,23 @@ class AuthController {
       });
     } catch (error) {
       console.error("Registration Error:", error);
-      res.status(500).json({ message: "Server error", error });
+      res.json({ message: "Server error", error });
     }
   }
 
   async verifyOTP(req, res) {
     try {
-      console.log("OTP Verification Request:", req.query);
       const { email, otp } = req.query;
 
       let user = await User.findOne({ email });
-      if (!user) return res.status(400).json({ message: "User not found" });
+      if (!user) return res.json({ message: "User not found" });
 
       if (user.isVerified)
-        return res.status(400).json({ message: "User already verified" });
+        return res.json({ message: "User already verified" });
 
       // ✅ Check OTP Validity
       if (user.otp !== otp || new Date() > user.otpExpires) {
-        return res.status(400).json({ message: "Invalid or expired OTP" });
+        return res.json({ message: "Invalid or expired OTP" });
       }
 
       // ✅ Verify User
@@ -233,7 +230,7 @@ class AuthController {
       res.redirect("http://localhost:5173/#/login");
     } catch (error) {
       console.error("OTP Verification Error:", error);
-      res.status(500).json({ message: "Server error", error });
+      res.json({ message: "Server error", error });
     }
   }
 
@@ -242,7 +239,7 @@ class AuthController {
       const { email } = req.body;
 
       let user = await User.findOne({ email });
-      if (!user) return res.status(400).json({ message: "User not found" });
+      if (!user) return res.json({ message: "User not found" });
 
       // Generate OTP (6-digit random number)
       const otp = Math.floor(100000 + Math.random() * 900000);
@@ -261,7 +258,7 @@ class AuthController {
       );
     } catch (error) {
       console.error("Error sending OTP:", error);
-      res.status(500).json({ message: "Error sending OTP", error });
+      res.json({ message: "Error sending OTP", error });
     }
   }
 
@@ -272,7 +269,11 @@ class AuthController {
       const user = await User.findOne({ email });
 
       if (!user) {
-        return res.status(400).json({ message: "Invalid credentials" });
+        return res.json({
+          status: false,
+          data: [],
+          message: "Invalid credentials",
+        });
       }
 
       // ✅ Fix async issue (await is required)
@@ -282,16 +283,24 @@ class AuthController {
       );
 
       if (!isMatch) {
-        return res.status(400).json({ message: "Invalid email or password" });
+        return res.json({
+          status: false,
+          data: [],
+          message: "Invalid email or password",
+        });
       }
 
-      if (!user.isVerified ) {
-        return res.status(400).json({ message: "User not verified" });
+      if (!user.isVerified) {
+        return res.json({
+          status: false,
+          data: [],
+          message: "User not verified",
+        });
       }
 
       let GetRole = await Role.findById(user.role);
       if (!GetRole) {
-        return res.status(400).json({ message: "Role not found" });
+        return res.json({ status: false, data: [], message: "Role not found" });
       }
 
       // ✅ Generate JWT Token (7 Days Expiry)
@@ -304,7 +313,7 @@ class AuthController {
       // ✅ Send response to frontend
       res.json({ token, status: true, msg: "Login successfully" });
     } catch (error) {
-      res.status(500).json({ message: "Server error", error });
+      res.json({ status: false, data: error, message: "Server error" });
     }
   }
 
@@ -314,14 +323,13 @@ class AuthController {
       const { token } = req.body;
 
       if (!token) {
-        return res.status(400).json({ message: "Token is required" });
+        return res.json({ message: "Token is required" });
       }
 
       // Verify Firebase Token
       const decodedToken = await admin.auth().verifyIdToken(token);
       const { uid, name, email, picture } = decodedToken;
 
-      console.log("Decoded Token:", decodedToken);
 
       // Check if user exists in DB
       let user = await User.findOne({ email });
@@ -348,13 +356,11 @@ class AuthController {
         }
       );
 
-      res
-        .status(200)
-        .json({
-          message: "Google Auth Successful",
-          token: jwtToken,
-          status: true,
-        });
+      res.status(200).json({
+        message: "Google Auth Successful",
+        token: jwtToken,
+        status: true,
+      });
     } catch (error) {
       console.error("Google Auth Error:", error);
       res.status(401).json({ message: "Google authentication failed", error });
@@ -365,8 +371,7 @@ class AuthController {
   async instagramAuth(req, res) {
     try {
       const { accessToken } = req.body;
-      if (!accessToken)
-        return res.status(400).json({ message: "Invalid access token" });
+      if (!accessToken) return res.json({ message: "Invalid access token" });
 
       let user = await User.findOne({ email: "dummy@instagram.com" });
 
@@ -389,9 +394,7 @@ class AuthController {
 
       res.json({ token, user });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Instagram authentication failed", error });
+      res.json({ message: "Instagram authentication failed", error });
     }
   }
 
@@ -399,8 +402,7 @@ class AuthController {
   async snapchatAuth(req, res) {
     try {
       const { accessToken } = req.body;
-      if (!accessToken)
-        return res.status(400).json({ message: "Invalid access token" });
+      if (!accessToken) return res.json({ message: "Invalid access token" });
 
       let user = await User.findOne({ email: "dummy@snapchat.com" });
 
@@ -423,9 +425,7 @@ class AuthController {
 
       res.json({ token, user });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Snapchat authentication failed", error });
+      res.json({ message: "Snapchat authentication failed", error });
     }
   }
 
@@ -443,7 +443,7 @@ class AuthController {
         req.user = decoded;
         next();
       } catch (error) {
-        res.status(400).json({ message: "Invalid token" });
+        res.json({ message: "Invalid token" });
       }
     };
   }
@@ -453,31 +453,29 @@ class AuthController {
       const token = req.header("Authorization");
       if (!token) return res.status(401).json({ message: "Access denied" });
 
-      console.log("Token:", token);
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("Decoded Token:", decoded);
+    
 
-      let UserFind = await User.findOne({_id: decoded.id }).select("profilePic")
-      if (!UserFind) return res.status(400).json({ message: "User not found" });
+      let UserFind = await User.findOne({ _id: decoded.id }).select(
+        "profilePic"
+      );
+      if (!UserFind) return res.json({ message: "User not found" });
 
-
-return res.send({status: true, data: UserFind.profilePic, message: "Profile photo fetched successfully"});
-
-
-
-
+      return res.send({
+        status: true,
+        data: UserFind.profilePic,
+        message: "Profile photo fetched successfully",
+      });
     } catch (error) {
       console.log("Error in GetProfilePhoto", error);
     }
   }
 
-
   async facebookcallback(req, res) {
-    try{
+    try {
       const { accessToken } = req.body;
-      console.log("Access Token:", req.body);
       if (!accessToken) {
-        return res.status(400).json({ message: "Invalid access token" });
+        return res.json({ message: "Invalid access token" });
       }
 
       // Verify Facebook Token
@@ -514,8 +512,7 @@ return res.send({status: true, data: UserFind.profilePic, message: "Profile phot
         token: jwtToken,
         status: true,
       });
-
-    }catch(error){
+    } catch (error) {
       console.log("Error in facebookcallback", error);
     }
   }

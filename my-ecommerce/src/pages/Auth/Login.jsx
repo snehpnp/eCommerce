@@ -3,16 +3,20 @@ import { useNavigate } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Logo from "../../assets/logo-removebg-preview.png";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth ,facebookProvider} from "../../utils/firebase-config";
+import { auth, facebookProvider } from "../../utils/firebase-config";
 import axios from "axios";
 import * as config from "../../utils/Config";
+import { ToastContainer, toast } from "react-toastify";
+
+import { Button } from "react-bootstrap";
+
 const AuthPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: localStorage.getItem("email") || "",
     password: "",
   });
-
+  const notify = () => toast("Wow so easy !");
   useEffect(() => {
     localStorage.setItem("email", formData.email);
   }, [formData.email]);
@@ -23,20 +27,48 @@ const AuthPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Logging in...", formData);
+
+
     let data = {
       email: formData.email,
       password: formData.password,
     };
+
+    // Pehle cache check karo
+    const cachedResponse = sessionStorage.getItem("loginResponse");
+    if (cachedResponse) {
+      const parsedResponse = JSON.parse(cachedResponse);
+      handleLoginSuccess(parsedResponse);
+      return;
+    }
+
     axios
       .post(config.react_domain + "/api/auth/login", data)
       .then((response) => {
-        localStorage.setItem("token", response.data.token);
-        navigate("/");
+  
+
+        if (response.data.status) {
+          sessionStorage.setItem(
+            "loginResponse",
+            JSON.stringify(response.data)
+          );
+          handleLoginSuccess(response.data);
+        } else {
+          toast.error(response.data.message);
+        }
       })
       .catch((error) => {
-        console.error("Login Error:", error.response.data.message);
+        console.error(
+          "Login Error:",
+          error.response?.data?.message || "Something went wrong!"
+        );
       });
+  };
+
+  const handleLoginSuccess = (data) => {
+    toast.success(data.message);
+    localStorage.setItem("token", data.token);
+    navigate("/");
   };
 
   // Google Login
@@ -51,7 +83,6 @@ const AuthPage = () => {
         config.react_domain + "/api/auth/google-auth",
         { token }
       );
-      console.log("Login successful:", response.data);
       if (response.data.status) {
         localStorage.setItem("token", response.data.token); // Store token in local storage
         navigate("/"); // Redirect to home page
@@ -67,21 +98,20 @@ const AuthPage = () => {
   // Facebook Login
   const handleFacebookLogin = async () => {
     try {
+      toast("Work in Progress");
+
       // Close any existing popup request before opening a new one
-      auth.currentUser && auth.signOut();
-  
-      const result = await signInWithPopup(auth, facebookProvider);
-      const token = await result.user.getIdToken(); // Get Firebase token
-  
-      console.log("Facebook User Data:", result.user);
-  
+      // auth.currentUser && auth.signOut();
+
+      // const result = await signInWithPopup(auth, facebookProvider);
+      // const token = await result.user.getIdToken(); // Get Firebase token
+
       // Send token to backend
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/facebook-auth",
-        { token }
-      );
-  
-      console.log("Backend Response:", response.data);
+      // const response = await axios.post(
+      //   "http://localhost:5000/api/auth/facebook-auth",
+      //   { token }
+      // );
+
     } catch (error) {
       console.error("Facebook Login Error:", error);
     }
@@ -167,6 +197,9 @@ const AuthPage = () => {
             New here? <a onClick={() => navigate("/signup")}>Sign Up</a>
           </div>
         </div>
+      </div>
+      <div className="grid place-items-center h-dvh bg-zinc-900/15">
+        <ToastContainer />
       </div>
     </div>
   );
