@@ -2,9 +2,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const User = require("../models/User");
-const Role = require("../Models/Role");
+const Role = require("../models/Role");
 const admin = require("firebase-admin");
-const CommanMail = require("../Utils/Commanmail");
+const CommanMail = require("../utils/Commanmail");
 
 const serviceAccount = require("../../socialauth-534b5-firebase-adminsdk-fbsvc-f87ccafa08.json");
 admin.initializeApp({
