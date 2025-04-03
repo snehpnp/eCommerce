@@ -11,11 +11,11 @@ const helmet = require("helmet"); // For security headers
 dotenv.config();
 
 // Import database connection
-const { connectToMongoDB } = require("./App/Config/Connection");
+const { connectToMongoDB } = require("./App/config/Connection");
 connectToMongoDB();
 
 // Import Routes
-const productRoutes = require("./App/Routes/productRoutes");
+const productRoutes = require("./App/routes/productRoutes");
 
 const app = express();
 
@@ -37,7 +37,7 @@ app.use(passport.session());
 
 // Routes
 app.use("/api", productRoutes);
-app.use("/api/auth", require("./App/Routes/authRoutes")); // Auth routes
+app.use("/api/auth", require("./App/routes/authRoutes")); // Auth routes
 
 // Global Error Handler (Catches All Errors)
 app.use((err, req, res, next) => {
