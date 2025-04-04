@@ -23,6 +23,7 @@ function Sheetsets({ path }) {
 
   const handleChange = (event) => {
     setIsTableView(event.target.checked);
+    setViewMode(event.target.checked ? "table" : "card");
   };
 
 
@@ -204,8 +205,14 @@ function Sheetsets({ path }) {
                       alt={product.name}
                     />
                     <div className="card-body">
-                      <h5 className="card-title">{product.name}</h5>
+                      <h5 className="card-title">{`${product.name}(${product.brand})`}</h5>
                       <p className="card-text">{product.description}</p>
+                      <p className="card-text">
+                        <strong>Category:</strong> {product.category}
+                      </p>
+                      <p className="card-text">
+                        <strong>Availability:</strong> {product.quantity}
+                      </p>
                       <p>
                         <strong>${product.price.toFixed(2)}</strong>
                       </p>
@@ -235,6 +242,8 @@ function Sheetsets({ path }) {
                   <th>Image</th>
                   <th>Name</th>
                   <th>Description</th>
+                  <th>Category</th>
+                  <th>Availability</th>
                   <th>Price</th>
                   <th>Actions</th>
                 </tr>
@@ -249,8 +258,11 @@ function Sheetsets({ path }) {
                         className="card__img"
                       />
                     </td>
-                    <td>{product.name}</td>
-                    <td>{product.description}</td>
+                    <td>{`${product.name}(${product.brand})`} </td>
+                    <td>{product.description?.substring(0, 50)}...</td>
+
+                    <td>{product.category}</td>
+                    <td>{product.quantity}</td>
                     <td>${product.price.toFixed(2)}</td>
                     <td>
                       <IconButton
