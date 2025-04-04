@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
 import {
   AppBar,
   Toolbar,
@@ -74,13 +76,15 @@ export default function ResponsiveNavbar() {
 
   const [getProfileLogo, setGetProfileLogo] = useState(null);
 
-  const navLinks = [
-    { name: "Sheet Sets", path: "/sheet-sets" },
-    { name: "Fitted Sheets", path: "/fitted-sheets" },
-    { name: "Flat Sheets", path: "/flat-sheets" },
-    { name: "Pillow Cases", path: "/pillow-cases" },
-    { name: "Bed Covers", path: "/bed-covers" },
-  ];
+  const [navLinks, setNavLinks] = useState([
+    { name: "Bedsheet Sets", path: "/bedsheet-sets" },
+    { name: "Pillow Covers", path: "/pillow-covers" },
+    { name: "Blanket Covers", path: "/blanket-covers" },
+    { name: "Mattress Protectors", path: "/mattress-protectors" },
+    { name: "Duvet Covers", path: "/duvet-covers" },
+  ]);
+
+
 
   const Logout = () => {
     localStorage.removeItem("token");
@@ -90,6 +94,19 @@ export default function ResponsiveNavbar() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
+
+ let decoded = jwtDecode(token);
+ console.log("Decoded JWT:", decoded); // Log the decoded JWT for debugging
+ if (decoded?.role === "ADMIN") {
+  const adminLinks = [
+    { name: "Dashboard", path: "/admin/dashboard" },
+    { name: "Products", path: "/admin/products" },
+    { name: "Orders", path: "/admin/orders" },
+    { name: "Users", path: "/admin/users" },
+  ];
+
+  setNavLinks(prevLinks => [...prevLinks, ...adminLinks]);
+}
       axios
         .get(`${config.react_domain}/api/auth/get-profile`, {
           headers: {
@@ -111,6 +128,9 @@ export default function ResponsiveNavbar() {
         });
     }
   }, []);
+
+
+  console.log("Profile Logo URL:", navLinks); // Log the profile logo URL for debugging
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -282,12 +302,7 @@ export default function ResponsiveNavbar() {
                 borderBottom: "1px solid #ddd", // Light separator for menu items
                 transition: "background 0.3s",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "#f0f0f0")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "transparent")
-              }
+             
             >
               <ListItemText primary={name} />
             </ListItem>
@@ -317,10 +332,7 @@ export default function ResponsiveNavbar() {
                 padding: "8px 12px",
                 borderRadius: "5px",
                 transition: "background 0.3s, color 0.3s",
-                "&:hover": {
-                  background: "#ddd", // Light gray on hover
-                  color: "#000",
-                },
+                
               }}
             >
               <Link

@@ -1,8 +1,6 @@
 import React from "react";
-import BestSelling from "./BestSelling";
-import HomeImg from "../assets/Images/Haven.jpg";
-import Shop from "./Shop";
-import HomeCarousel from "./HomeCarousel";
+import Shop from "./Tabs/Shop";
+import HomeCarousel from "./Tabs/HomeCarousel";
 
 const Home = () => {
   return (
@@ -21,19 +19,12 @@ const Home = () => {
           }}
         />
 
-        <BestSelling />
+        {/* <BestSelling /> */}
         <Shop name={"Flat Bedsheets"} home={true}/>
 
         <HomeCarousel />
 
-        {/* <Shop name={"Fitted Bedsheets"} />
-        <Shop name={"Pillow Cases"} />
-        <Shop name={"Bed Covers"} />
-        <Shop name={"Sheet Sets"} />
-        <Shop name={"Comforter Sets"} />
-        <Shop name={"Bed Skirts"} />
-        
-        <Shop name={"Premium Comforter"} /> */}
+     
       </div>
     </>
   );

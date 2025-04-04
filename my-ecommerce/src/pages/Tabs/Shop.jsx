@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { FaHeart, FaShoppingCart, FaTag } from "react-icons/fa"; // Classic Icons
-import img1 from "../assets/Images/Bed Skirt.jpg";
-import img2 from "../assets/Images/Both.jpg";
-import img3 from "../assets/Images/Comforter Sets.jpg";
-import img4 from "../assets/Images/dex-ezekiel-rYPW3gKsbYc-unsplash.jpg";
+import img1 from "../../assets/Images/Bed Skirt.jpg";
+import img2 from "../../assets/Images/Both.jpg";
+import img3 from "../../assets/Images/Comforter Sets.jpg";
+import img4 from "../../assets/Images/dex-ezekiel-rYPW3gKsbYc-unsplash.jpg";
 import axios from "axios";
-import * as Config from "../utils/Config";
+import * as Config from "../../utils/Config";
 
 const cachedProducts = [
   {
@@ -42,14 +42,14 @@ const cachedProducts = [
   },
 ];
 
-function Shop({ name }) {
+function Shop({ name, home }) {
   const [products, setProducts] = useState([]);
 
   const GetProducts = async () => {
     try {
       const response = await axios.get(`${Config.react_domain}/api/products`);
       const data = response.data;
-   
+
       setProducts(data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -109,8 +109,6 @@ function Shop({ name }) {
                 style={{ color: "green", cursor: "pointer" }}
               />
             </div>
-
-         
           </article>
         ))}
       </main>

@@ -25,9 +25,7 @@ function App() {
             navigate("/login");
           } else {
             if (
-              ["/login", "/signup", "/forgotpassword"].includes(
-                location.pathname
-              )
+              ["/login", "/signup", "/forgotpassword"].includes(location.pathname)
             ) {
               navigate("/");
             }

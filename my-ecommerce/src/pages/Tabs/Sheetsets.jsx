@@ -2,19 +2,25 @@ import React, { useState ,useEffect} from "react";
 import axios from "axios";
 import * as Config from "../../utils/Config";
 
-function Sheetsets() {
+function Sheetsets({path}) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [viewMode, setViewMode] = useState("card");
   const [sortOrder, setSortOrder] = useState("default");
   const [availability, setAvailability] = useState("all");
   const [priceRange, setPriceRange] = useState(200);
-
   const [products, setProducts] = useState([]);
+  
 
   const GetProducts = async () => {
     try {
       const response = await axios.get(`${Config.react_domain}/api/products`);
       const data = response.data;
+
+      selectedCategory === "All"
+        ? setProducts(data)
+        : setProducts(
+            data.filter((product) => product.category === selectedCategory)
+          );
 
       setProducts(data);
     } catch (error) {
@@ -29,16 +35,12 @@ function Sheetsets() {
     fetchProducts();
   }, []);
 
-  const filteredProducts =
-    selectedCategory === "All"
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
 
   return (
     <div className="container-fluid">
-      <h1 className="text-center my-4" style={{ fontWeight: "bold" }}>
-        Sheet Sets Collection
-      </h1>
+      {/* <h1 className="text-center my-4" style={{ fontWeight: "bold" }}>
+       {path?path: "Sheet Sets Collection"}
+      </h1> */}
       <div className="row">
         <div
           className="col-lg-2"
@@ -258,7 +260,7 @@ function Sheetsets() {
           <div className="product-list">
             {viewMode === "card" ? (
               <div className="product-container">
-                {filteredProducts.map((product) => (
+                {products.map((product) => (
                   <div key={product._id} className="product-card">
                     <img
                       src={product.mainImage}
@@ -298,7 +300,7 @@ function Sheetsets() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.map((product) => (
+                  {products.map((product) => (
                     <tr key={product.id}>
                       <td>
                         <img

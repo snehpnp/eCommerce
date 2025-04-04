@@ -120,7 +120,11 @@ article:nth-child(4) {
 .card__img {
   width: 180px;
   height: 200px;
-  /* padding: 3rem 0; */
+  transition: 0.5s;
+}
+.card__img1 {
+  width: 220px;
+  height: 200px;
   transition: 0.5s;
 }
 .card__name {
@@ -172,7 +176,7 @@ article:nth-child(4) {
   left: 0;
 }
 .card:hover .card__img {
-  transform: rotate(30deg);
+  transform: rotate(15deg);
   margin-left: 3.5rem;
 }
 .card:hover .card__precis {

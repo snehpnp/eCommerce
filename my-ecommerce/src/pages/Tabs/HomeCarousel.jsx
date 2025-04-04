@@ -1,7 +1,7 @@
 import React from "react";
-import Haven from "../assets/Images/Haven.jpg";
-import HomeImg from "../assets/Images/Bed Skirt.jpg";
-import Couple from "../assets/Images/Comforter Sets.jpg";
+import Haven from "../../assets/Images/Haven.jpg";
+import HomeImg from "../../assets/Images/Bed Skirt.jpg";
+import Couple from "../../assets/Images/Comforter Sets.jpg";
 
 function HomeCarousel() {
   return (
