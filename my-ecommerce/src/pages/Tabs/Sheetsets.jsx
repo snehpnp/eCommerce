@@ -1,46 +1,6 @@
-import React, { useState } from "react";
-
-const products = [
-  {
-    id: 1,
-    name: "Luxury Sheet Set",
-    description: "Soft and comfortable cotton sheets",
-    price: 99.99,
-    discountPrice: 79.99,
-    image:
-      "https://images.unsplash.com/photo-1602143407151-7111542de6e8?ixlib=rb-4.0.3",
-    category: "Cotton",
-  },
-  {
-    id: 2,
-    name: "Silk Sheet Set",
-    description: "Premium silk sheets for a luxurious feel",
-    price: 129.99,
-    discountPrice: 109.99,
-    image:
-      "https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-4.0.3",
-    category: "Silk",
-  },
-  {
-    id: 3,
-    name: "Bamboo Sheet Set",
-    description: "Eco-friendly and breathable bamboo sheets",
-    price: 89.99,
-    image:
-      "https://images.unsplash.com/photo-1583394838336-acd977736f90?ixlib=rb-4.0.3",
-    category: "Bamboo",
-  },
-  {
-    id: 4,
-    name: "Linen Sheet Set",
-    description: "Durable and comfortable linen sheets",
-    price: 109.99,
-    discountPrice: 99.99,
-    image:
-      "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3",
-    category: "Linen",
-  },
-];
+import React, { useState ,useEffect} from "react";
+import axios from "axios";
+import * as Config from "../../utils/Config";
 
 function Sheetsets() {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -49,13 +9,33 @@ function Sheetsets() {
   const [availability, setAvailability] = useState("all");
   const [priceRange, setPriceRange] = useState(200);
 
+  const [products, setProducts] = useState([]);
+
+  const GetProducts = async () => {
+    try {
+      const response = await axios.get(`${Config.react_domain}/api/products`);
+      const data = response.data;
+
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts(cachedProducts); // Fallback to cached products in case of error
+    }
+  };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      await GetProducts();
+    };
+    fetchProducts();
+  }, []);
+
   const filteredProducts =
     selectedCategory === "All"
       ? products
       : products.filter((product) => product.category === selectedCategory);
 
   return (
-    <div className="container-fluid" >
+    <div className="container-fluid">
       <h1 className="text-center my-4" style={{ fontWeight: "bold" }}>
         Sheet Sets Collection
       </h1>
@@ -213,12 +193,16 @@ function Sheetsets() {
                 View Mode:
               </label>
 
-              <div style={{ position: "relative", width: "60px", height: "30px" }}>
+              <div
+                style={{ position: "relative", width: "60px", height: "30px" }}
+              >
                 <input
                   type="checkbox"
                   id="toggleView"
                   checked={viewMode === "table"}
-                  onChange={() => setViewMode(viewMode === "card" ? "table" : "card")}
+                  onChange={() =>
+                    setViewMode(viewMode === "card" ? "table" : "card")
+                  }
                   style={{ display: "none" }}
                 />
 
@@ -256,9 +240,15 @@ function Sheetsets() {
                   }}
                 >
                   {viewMode === "table" ? (
-                    <i className="fas fa-table" style={{ fontSize: "12px", color: "#4CAF50" }}></i>
+                    <i
+                      className="fas fa-table"
+                      style={{ fontSize: "12px", color: "#4CAF50" }}
+                    ></i>
                   ) : (
-                    <i className="fas fa-th" style={{ fontSize: "12px", color: "#999" }}></i>
+                    <i
+                      className="fas fa-th"
+                      style={{ fontSize: "12px", color: "#999" }}
+                    ></i>
                   )}
                 </div>
               </div>
@@ -269,22 +259,25 @@ function Sheetsets() {
             {viewMode === "card" ? (
               <div className="product-container">
                 {filteredProducts.map((product) => (
-                  <div key={product.id} className="product-card">
+                  <div key={product._id} className="product-card">
                     <img
-                      src={product.image}
+                      src={product.mainImage}
                       alt={product.name}
                       className="product-image"
                     />
                     <h3>{product.name}</h3>
                     <p>{product.description}</p>
                     <div>
-                      {product.discountPrice ? (
+                      {product.price
+                        ? (
                         <>
                           <span className="original-price">
-                            ${product.price.toFixed(2)}
+                            ${product.price
+                              .toFixed(2)}
                           </span>
                           <span className="discount-price">
-                            ${product.discountPrice.toFixed(2)}
+                            ${product.price
+                              .toFixed(2)}
                           </span>
                         </>
                       ) : (
@@ -309,7 +302,7 @@ function Sheetsets() {
                     <tr key={product.id}>
                       <td>
                         <img
-                          src={product.image}
+                          src={product.mainImage}
                           alt={product.name}
                           className="table-image"
                         />
@@ -317,13 +310,14 @@ function Sheetsets() {
                       <td>{product.name}</td>
                       <td>{product.description}</td>
                       <td>
-                        {product.discountPrice ? (
+                        {product.price
+                          ? (
                           <>
                             <span className="original-price">
                               ${product.price.toFixed(2)}
                             </span>
                             <span className="discount-price">
-                              ${product.discountPrice.toFixed(2)}
+                              ${product.price.toFixed(2)}
                             </span>
                           </>
                         ) : (

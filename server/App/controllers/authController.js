@@ -345,6 +345,12 @@ class AuthController {
           authType: "google",
         });
         await user.save();
+      }else{
+        // Update user profile picture if it has changed
+        if (user.profilePic !== picture) {
+          user.profilePic = picture;
+          await user.save();
+        }
       }
 
       // Generate JWT for session management

@@ -42,14 +42,14 @@ const cachedProducts = [
   },
 ];
 
-function Shop({ name }) {
+function Shop({ name, home }) {
   const [products, setProducts] = useState([]);
 
   const GetProducts = async () => {
     try {
       const response = await axios.get(`${Config.react_domain}/api/products`);
       const data = response.data;
-   
+
       setProducts(data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -109,31 +109,6 @@ function Shop({ name }) {
                 style={{ color: "green", cursor: "pointer" }}
               />
             </div>
-
-            {/* {product.offer && (
-              <div className="offer-banner" style={{ background: "#ff9800", color: "white", padding: "5px", borderRadius: "5px", textAlign: "center", marginTop: "10px" }}>
-                <FaTag /> {product.offer}
-              </div>
-            )} */}
-
-            {/* <button
-              style={{
-                width: "100%",
-                padding: "10px",
-                background: "#4CAF50",
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-                marginTop: "10px",
-                borderRadius: "5px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
-            >
-              <FaShoppingCart /> Add to Cart
-            </button> */}
           </article>
         ))}
       </main>

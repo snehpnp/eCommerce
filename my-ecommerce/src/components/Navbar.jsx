@@ -16,12 +16,26 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+// import { InputBase, IconButton, Box } from "@mui/material";
+// import { Search as SearchIcon } from "@mui/icons-material";
+
+// Custom styled input (works like MUI's InputBase)
+const StyledInput = styled(InputBase)(({ theme }) => ({
+  flex: 1,
+  padding: "6px 10px",
+  fontSize: "16px",
+  border: "none",
+  outline: "none",
+}));
+
 import {
+  AccountCircle,
+  Settings,
+  Logout as LogoutIcon,
   Menu as MenuIcon,
   Search as SearchIcon,
   Mail as MailIcon,
   Notifications as NotificationsIcon,
-  AccountCircle,
 } from "@mui/icons-material";
 import { styled, useTheme } from "@mui/material/styles";
 import Logo from "../assets/logo-removebg-preview.png";
@@ -58,7 +72,7 @@ export default function ResponsiveNavbar() {
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
-  const [getProfileLogo , setGetProfileLogo] = useState(null);
+  const [getProfileLogo, setGetProfileLogo] = useState(null);
 
   const navLinks = [
     { name: "Sheet Sets", path: "/sheet-sets" },
@@ -73,7 +87,7 @@ export default function ResponsiveNavbar() {
     window.location.href = "/#/login"; // Redirect to login page after logout
   };
 
-    useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       axios
@@ -83,11 +97,13 @@ export default function ResponsiveNavbar() {
           },
         })
         .then((response) => {
-          if(response.data.status) {
+          if (response.data.status) {
             setGetProfileLogo(response.data.data);
-          }
-          else {
-            console.error("Failed to fetch profile data:", response.data.message);
+          } else {
+            console.error(
+              "Failed to fetch profile data:",
+              response.data.message
+            );
           }
         })
         .catch((error) => {
@@ -95,8 +111,6 @@ export default function ResponsiveNavbar() {
         });
     }
   }, []);
-
-
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -115,34 +129,66 @@ export default function ResponsiveNavbar() {
               alignItems: "center",
             }}
           >
-            <img
-              src={Logo}
-              alt="Logo"
-              style={{
-                width: "250px",
-                height: "81px",
-                maxHeight: "81px",
-                paddingLeft: 0,
-              }}
-            />
+            {" "}
+            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+              <img
+                src={Logo}
+                alt="Logo"
+                style={{
+                  width: "250px",
+                  height: "81px",
+                  maxHeight: "81px",
+                  paddingLeft: 0,
+                }}
+              />
+            </Link>
           </Box>
 
-          <Box sx={{ flexGrow: 25, display: "flex", alignItems: "start" }}>
-            <Search>
-              <SearchIcon />
-              <StyledInputBase
-                placeholder="Search…"
+          <Box
+            sx={{
+              flexGrow: 25,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              px: isMobile ? 1 : 5,
+              py: 1,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#fff",
+                borderRadius: "30px",
+                px: 2,
+                py: 0.5,
+                boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
+                width: isMobile ? "100%" : "60%",
+                maxWidth: "700px",
+              }}
+            >
+              <SearchIcon sx={{ color: "gray", mr: 1 }} />
+              <StyledInput
+                placeholder="Search for products, categories, brands…"
                 inputProps={{ "aria-label": "search" }}
               />
-            </Search>
+              <IconButton
+                sx={{
+                  backgroundColor: "#1976d2",
+                  color: "#fff",
+                  ml: 1,
+                  p: "8px",
+                  "&:hover": {
+                    backgroundColor: "#115293",
+                  },
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Box>
           </Box>
 
           <Box sx={{ flexGrow: 1, display: "flex", alignItems: "end" }}>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="error">
-                <MailIcon fontSize="large" />
-              </Badge>
-            </IconButton>
             <IconButton color="inherit">
               <Badge badgeContent={10} color="error">
                 <NotificationsIcon fontSize="large" />
@@ -151,7 +197,7 @@ export default function ResponsiveNavbar() {
           </Box>
 
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            {getProfileLogo ? (
+            {getProfileLogo && getProfileLogo !== "" ? (
               <img
                 src={getProfileLogo}
                 alt="Profile"
@@ -159,6 +205,11 @@ export default function ResponsiveNavbar() {
                   width: "40px",
                   height: "40px",
                   borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = Logo; // fallback in case URL fails
                 }}
               />
             ) : (
@@ -170,10 +221,40 @@ export default function ResponsiveNavbar() {
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            PaperProps={{
+              sx: {
+                mt: 1.5,
+                borderRadius: 2,
+                minWidth: 180,
+                boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+              },
+            }}
           >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-            <MenuItem onClick={() => Logout()}>Logout</MenuItem>
+            <MenuItem onClick={handleMenuClose}>
+              <AccountCircle sx={{ mr: 1 }} />
+              Profile
+            </MenuItem>
+            <MenuItem onClick={handleMenuClose}>
+              <Settings sx={{ mr: 1 }} />
+              Settings
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                Logout();
+              }}
+            >
+              <LogoutIcon sx={{ mr: 1 }} />
+              Logout
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
