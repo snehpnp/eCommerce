@@ -19,16 +19,16 @@ const Home = () => {
             objectFit: "cover",
           }}
         />
-    <div>
-      <h2 style={{ textAlign: "center", margin: "20px 0" }}>Our Bedsheet Collection</h2>
+        <div>
+          <h2 style={{ textAlign: "center", margin: "20px 0" }}>
+            Our Bedsheet Collection
+          </h2>
 
-<Card/>
-</div>
-        <Shop name={"Flat Bedsheets"} home={true}/>
+          <Card />
+        </div>
+        <Shop name={"Flat Bedsheets"} home={true} />
 
         <HomeCarousel />
-
-     
       </div>
     </>
   );

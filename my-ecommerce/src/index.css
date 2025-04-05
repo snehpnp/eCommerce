@@ -40,9 +40,7 @@ body {
   margin: auto;
   display: block;
 }
-.wrapper {
-  padding: 100px;
-}
+
 
 /* SHOP */
 @media screen and (min-width: 768px) {
@@ -185,6 +183,17 @@ article:nth-child(4) {
 
 footer {
   text-align: center;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 100px;
+}
+
+main {
+  flex: 1;
 }
 
 /*-- MEDIA QUERIES --*/

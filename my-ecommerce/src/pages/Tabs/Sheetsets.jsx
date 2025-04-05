@@ -33,7 +33,7 @@ function Sheetsets({ path }) {
       await GetProducts();
     };
     fetchProducts();
-  }, []);
+  }, [path]);
   const CardView = ({ products }) => {
     return (
       <div

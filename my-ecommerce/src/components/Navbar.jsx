@@ -82,10 +82,12 @@ export default function ResponsiveNavbar() {
   let navLinks = [
     { name: "Bedsheet Sets", path: "/bedsheets" },
     { name: "Pillow Covers", path: "/pillow-covers" },
-    { name: "Blanket Covers", path: "/blanket-covers" },
+    { name: "Blankets", path: "/blanket" },
     { name: "Mattress Protectors", path: "/mattress-protectors" },
     { name: "Duvet Covers", path: "/duvet-covers" },
   ]
+// Bedsheets ,Pillow Covers,Pillows,Blankets,Comforters & Duvets,Mattress Protectors,Quilts & Razai,Bed Covers,Cushion Covers,Bedding Sets,Mattresses,Throws
+
 
   const Logout = () => {
     localStorage.removeItem("token");

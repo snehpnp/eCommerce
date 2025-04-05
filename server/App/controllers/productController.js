@@ -101,7 +101,18 @@ console.log("CategoryId:", CategoryId);
           if(CategoryId == "pillow-covers") {
             query.category = { $regex: new RegExp(`^${"Pillow Covers"}$`, 'i') };
 
-          }else {
+          }else if(CategoryId == "mattress-protectors") {
+            query.category = { $regex: new RegExp(`^${"Mattress Protectors"}$`, 'i') };
+
+          }else if(CategoryId == "blanket") {
+            query.category = { $regex: new RegExp(`^${"Blankets"}$`, 'i') };
+
+          }else if(CategoryId == "duvet-covers") {
+            query.category = { $regex: new RegExp(`^${"Comforters & Duvets"}$`, 'i') };
+
+          }
+          
+          else {
 
             query.category = { $regex: new RegExp(`^${CategoryId}$`, 'i') };
           }
