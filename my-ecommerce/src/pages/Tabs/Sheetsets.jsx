@@ -1,20 +1,36 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import * as Config from "../../utils/Config";
+import { ToastContainer, toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
+import {fetchAllProducts} from "../../features/api/User"
+import { useDispatch } from "react-redux";
 
 function Sheetsets({ path }) {
+  const dispatch = useDispatch();
+
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [viewMode, setViewMode] = useState("card");
   const [sortOrder, setSortOrder] = useState("default");
   const [availability, setAvailability] = useState("all");
   const [priceRange, setPriceRange] = useState(200);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [likes, setLikes] = useState({});
+  const [imageIndex, setImageIndex] = useState({});
 
   const GetProducts = async () => {
     try {
       let Filter = { category: path };
-      const response = await axios.get(`${Config.react_domain}/api/products`, { params: Filter });
-      const data = response.data;
+
+  
+      
+      const response = await axios.get(`${Config.react_domain}/api/products`, {
+        params: Filter,
+      });
+      const data = response.data.data;
+
+      console.log("Products fetched:", data);
 
       selectedCategory === "All"
         ? setProducts(data)
@@ -25,84 +41,27 @@ function Sheetsets({ path }) {
       setProducts(data);
     } catch (error) {
       console.error("Error fetching products:", error);
-      setProducts(cachedProducts); // Fallback to cached products in case of error
+      setProducts(); // Fallback to cached products in case of error
     }
   };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`${Config.react_domain}/api/categories`);
+      setCategories(res.data);
+    } catch (err) {
+      console.error("Failed to fetch categories", err);
+    }
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       await GetProducts();
+      await fetchCategories();
     };
     fetchProducts();
   }, [path]);
-  const CardView = ({ products }) => {
-    return (
-      <div
-        className="product-container"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
-          gap: "20px",
-          marginTop: "20px",
-        }}
-      >
-        {products.map((product) => (
-          <div
-            key={product._id}
-            className="product-card1 shadow-sm"
-            style={{
-              background: "#fff",
-              border: "1px solid #eee",
-              borderRadius: "10px",
-              padding: "20px",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}
-          >
-            {/* Images */}
-            <div
-              style={{
-                overflowX: "auto",
-                whiteSpace: "nowrap",
-                marginBottom: "10px",
-              }}
-            >
-              {product.allImages?.map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  alt={`product-${i}`}
-                  style={{
-                    width: "100%",
-                    maxHeight: "250px",
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                    marginBottom: "8px",
-                  }}
-                />
-              ))}
-            </div>
 
-            {/* Info */}
-            <h5 style={{ fontWeight: "bold" }}>{product.name}</h5>
-            <p style={{ fontSize: "14px", color: "#666" }}>
-              {product.description}
-            </p>
-            <p style={{ fontWeight: "bold", color: "#28a745" }}>
-              ${product.price.toFixed(2)}
-            </p>
-
-            {/* Buttons */}
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button className="btn btn-outline-secondary btn-sm">❤️</button>
-              <button className="btn btn-primary btn-sm">Add to Cart</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
   const TableView = ({ products }) => {
     return (
       <div style={{ overflowX: "auto", marginTop: "20px" }}>
@@ -139,8 +98,12 @@ function Sheetsets({ path }) {
                 <td>{product.description}</td>
                 <td>{product.price.toFixed(2)}</td>
                 <td>
-                  <button className="btn btn-outline-secondary btn-sm me-2">❤️</button>
-                  <button className="btn btn-primary btn-sm">Add to Cart</button>
+                  <button className="btn btn-outline-secondary btn-sm me-2">
+                    ❤️
+                  </button>
+                  <button className="btn btn-primary btn-sm">
+                    Add to Cart
+                  </button>
                 </td>
               </tr>
             ))}
@@ -149,7 +112,245 @@ function Sheetsets({ path }) {
       </div>
     );
   };
+
+  const Card = ({ product }) => {
+    const [imageFade, setImageFade] = useState(false);
+    const currentImgIndex = imageIndex[product._id] || 0;
   
+    const handleImageScrollWithAnimation = (productId, direction, length) => {
+      setImageFade(true);
+      setTimeout(() => {
+        handleImageScroll(productId, direction, length);
+        setImageFade(false);
+      }, 200);
+    };
+  
+    const truncateDescription = (desc = "", limit = 30) => {
+      return desc.length > limit ? desc.slice(0, limit) + "..." : desc;
+    };
+  
+    return (
+      <div
+        key={product._id}
+        style={{
+          background: "#fff",
+          width: "100%",
+          maxWidth: "23%",
+          border: "1px solid #ddd",
+          borderRadius: "12px",
+          overflow: "hidden",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          fontFamily: "sans-serif",
+          flex: "1 1 calc(100% - 40px)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          height: "500px", // Fix height
+        }}
+      >
+        {/* Image Carousel */}
+        <div style={{ position: "relative", height: "220px" }}>
+          <img
+            src={
+              product.allImages[currentImgIndex] ||
+              "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743851017/Image-not-found_g64396.png"
+            }
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src =
+                "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743851017/Image-not-found_g64396.png";
+            }}
+            alt="product"
+            style={{
+              width: "100%",
+              height: "220px",
+              objectFit: "cover",
+              transition: "opacity 0.3s ease-in-out",
+              opacity: imageFade ? 0 : 1,
+            }}
+          />
+          <span
+            onClick={() =>
+              handleImageScrollWithAnimation(product._id, "left", product.allImages.length)
+            }
+            style={arrowButtonStyle("left")}
+          >
+            {"<"}
+          </span>
+          <span
+            onClick={() =>
+              handleImageScrollWithAnimation(product._id, "right", product.allImages.length)
+            }
+            style={arrowButtonStyle("right")}
+          >
+            {">"}
+          </span>
+        </div>
+  
+        {/* Product Info */}
+        <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <h4 style={{ margin: 0, color: "#666" }}>{product.brand}</h4>
+            <h3 style={{ margin: "4px 0" }}>{product.name}</h3>
+            <p
+              style={{
+                fontSize: "14px",
+                color: "#777",
+                margin: "4px 0",
+                minHeight: "40px",
+                lineHeight: "20px",
+              }}
+            >
+              {truncateDescription(product.description, 60)}
+            </p>
+            <p style={{ margin: "4px 0", color: "#555" }}>Size: {product.size}</p>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: "8px",
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  ₹
+                  {product.price -
+                    (product.price * product?.discount || 10) / 100}
+                </span>
+                <span
+                  style={{
+                    textDecoration: "line-through",
+                    marginLeft: "8px",
+                    color: "#999",
+                    fontSize: "14px",
+                  }}
+                >
+                  ₹{product.price}
+                </span>
+              </div>
+              <span
+                style={{
+                  background: "green",
+                  color: "#fff",
+                  fontSize: "12px",
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                }}
+              >
+                {product?.discount || 10}% OFF
+              </span>
+            </div>
+          </div>
+  
+          {/* Buttons */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "12px",
+            }}
+          >
+            <button
+              onClick={() => AddToCart(product)}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#2196F3",
+                color: "#fff",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              Add to Cart
+            </button>
+            <button
+              onClick={() => toggleLike(product._id)}
+              style={{
+                background: "#fff",
+                border: likes[product._id] ? "1px solid red" : "1px solid #ccc",
+                borderRadius: "50%",
+                fontSize: "20px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: likes[product._id] ? "red" : "#888",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: likes[product._id]
+                  ? "0 0 10px rgba(255, 0, 0, 0.3)"
+                  : "0 0 6px rgba(0,0,0,0.1)",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = "scale(1.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = "scale(1)";
+              }}
+            >
+              ♥
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  const arrowButtonStyle = (side) => ({
+    position: "absolute",
+    [side]: "10px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    padding: "4px 8px",
+    cursor: "pointer",
+    zIndex: 1,
+  });
+
+  const AddToCart = async (product) => {
+    const decoded = jwtDecode(localStorage.getItem("token"));
+
+    let data = {
+      userId: decoded.id,
+      productId: product._id,
+    };
+
+    const responseData = await axios.post(
+      `${Config.react_domain}/api/addtocart`,
+      data
+    );
+    if (responseData.data.status) {
+      toast.success("Product added to cart successfully");
+    } else {
+      toast.error("Product already in cart");
+    }
+  };
+
+  const truncateDescription = (text, wordLimit) => {
+    const words = text.trim().split(" ");
+    return words.length <= wordLimit
+      ? text
+      : words.slice(0, wordLimit).join(" ") + "...";
+  };
+
+  const handleImageScroll = (productId, dir, total) => {
+    setImageIndex((prev) => {
+      const currentIndex = prev[productId] || 0;
+      const nextIndex =
+        dir === "left"
+          ? (currentIndex - 1 + total) % total
+          : (currentIndex + 1) % total;
+      return { ...prev, [productId]: nextIndex };
+    });
+  };
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -187,36 +388,11 @@ function Sheetsets({ path }) {
               }}
             >
               <option value="All">All</option>
-              <option value="Cotton">Cotton</option>
-              <option value="Silk">Silk</option>
-              <option value="Bamboo">Bamboo</option>
-              <option value="Linen">Linen</option>
-            </select>
-          </div>
-
-          {/* Availability Filter */}
-          <div className="availability-filter" style={{ marginBottom: "15px" }}>
-            <label
-              style={{
-                fontWeight: "bold",
-                display: "block",
-                marginBottom: "5px",
-              }}
-            >
-              Availability:
-            </label>
-            <select
-              onChange={(e) => setAvailability(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "6px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            >
-              <option value="all">All</option>
-              <option value="inStock">In Stock</option>
-              <option value="outOfStock">Out of Stock</option>
+              {categories.map((category) => (
+                <option key={category._id} value={category.name}>
+                  {category.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -370,13 +546,37 @@ function Sheetsets({ path }) {
 
           <div className="product-list">
             {viewMode === "card" ? (
-              <CardView products={products} />
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "20px",
+                  padding: "16px",
+                }}
+              >
+                {products.map((product) => (
+                  <Card key={product._id} product={product} />
+                ))}
+              </div>
             ) : (
               <TableView products={products} />
             )}
           </div>
         </div>
       </div>
+
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 }

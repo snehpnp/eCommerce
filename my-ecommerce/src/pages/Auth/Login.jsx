@@ -178,14 +178,14 @@ const AuthPage = () => {
               style={{ fontSize: "32px", color: "#4267B2" }}
               onClick={handleFacebookLogin}
             ></i>
-            <i
+            {/* <i
               className="fa-brands fa-instagram"
               style={{ fontSize: "32px", color: "#C13584" }}
             ></i>
             <i
               className="fa-brands fa-snapchat"
               style={{ fontSize: "32px", color: "#FFFC00" }}
-            ></i>
+            ></i> */}
             <i
               className="fa-brands fa-google"
               style={{ fontSize: "32px", color: "#DB4437" }}

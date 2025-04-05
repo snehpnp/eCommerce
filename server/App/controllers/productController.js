@@ -1,5 +1,6 @@
 "use strict";
 
+const { stat } = require('fs');
 const path = require('path');
 const Product = require(path.resolve(__dirname, '../models/product'));
 const Category = require(path.resolve(__dirname, '../models/Cattegories'));
@@ -30,7 +31,7 @@ class ProductController {
       let existingProduct = await Product.findOne({ productCode });
 
       if (existingProduct) {
-        return res.status(400).json({ message: "Product code already exists" });
+        return res.json({ msg: "Product code already exists",status:false,data:[] });
       }
 
       const newProduct = new Product({
@@ -53,10 +54,10 @@ class ProductController {
       });
 
       await newProduct.save();
-      res.status(201).json({ message: "Product created successfully", product: newProduct });
+      res.status(201).json({ msg: "Product created successfully", product: newProduct ,status:true});
     } catch (err) {
       console.error(err);
-      res.status(400).json({ message: "Error creating product", error: err });
+      res.json({ msg: "Error creating product", data: err ,status:false });
     }
   }
 
@@ -65,7 +66,7 @@ class ProductController {
     const { data } = req.body;
 
     if (!Array.isArray(data) || data.length === 0) {
-      return res.status(400).json({ message: "No data provided" });
+      return res.json({ msg: "No data provided", status:false ,data:[] });
     }
 
     try {
@@ -75,14 +76,14 @@ class ProductController {
       const duplicateCodes = data.filter(p => existingCodes.includes(p.productCode));
 
       if (duplicateCodes.length > 0) {
-        return res.status(400).json({ message: "Product codes already exist", duplicateCodes: duplicateCodes.map(p => p.productCode) });
+        return res.json({ msg: "Product codes already exist", duplicateCodes: duplicateCodes.map(p => p.productCode),status:false ,data:[] });
       }
 
       const newProducts = await Product.insertMany(data);
-      res.status(201).json({ message: "Products created successfully", products: newProducts });
+      res.status(201).json({ msg: "Products created successfully", products: newProducts,status:true,data:[] });
     } catch (err) {
       console.error(err);
-      res.status(400).json({ message: "Error creating products", error: err });
+      res.json({ msg: "Error creating products", data: err,status:false });
     }
   }
 
@@ -121,9 +122,9 @@ class ProductController {
       
 
       const products = await Product.find(query).sort({ createdAt: -1 });
-      res.status(200).json(products);
+      res.json({data:products,msg:"success",status:true});
     } catch (err) {
-      res.status(400).json({ message: "Error fetching products", error: err });
+      res.json({ msg: "Error fetching products", data: err,status:false });
     }
   }
 
@@ -131,10 +132,10 @@ class ProductController {
    async getProductById(req, res) {
     try {
       const product = await Product.findById(req.params.id);
-      if (!product) return res.status(404).json({ message: "Product not found" });
-      res.status(200).json(product);
+      if (!product) return res.status(404).json({ msg: "Product not found" });
+      res.json(product);
     } catch (err) {
-      res.status(400).json({ message: "Error fetching product", error: err });
+      res.json({ msg: "Error fetching product", data: err ,status:false });
     }
   }
 
@@ -142,10 +143,10 @@ class ProductController {
    async updateProduct(req, res) {
     try {
       const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!updatedProduct) return res.status(404).json({ message: "Product not found" });
-      res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
+      if (!updatedProduct) return res.status(404).json({ msg: "Product not found" });
+      res.json({ msg: "Product updated successfully", product: updatedProduct,status:true });
     } catch (err) {
-      res.status(400).json({ message: "Error updating product", error: err });
+      res.json({ msg: "Error updating product", data: err ,status});
     }
   }
 
@@ -153,10 +154,10 @@ class ProductController {
    async deleteProduct(req, res) {
     try {
       const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-      if (!deletedProduct) return res.status(404).json({ message: "Product not found" });
-      res.status(200).json({ message: "Product deleted successfully" });
+      if (!deletedProduct) return res.status(404).json({ msg: "Product not found",status:false,data:[] });
+      res.json({ msg: "Product deleted successfully",status:true,data:[] });
     } catch (err) {
-      res.status(400).json({ message: "Error deleting product", error: err });
+      res.json({ msg: "Error deleting product", data: err,status:false });
     }
   }
 
@@ -166,10 +167,10 @@ class ProductController {
       try {
         const newCategory = new Category({ name, description });
         await newCategory.save();
-        res.status(201).json({ message: "Category created successfully", category: newCategory });
+        res.status(201).json({ msg: "Category created successfully", category: newCategory,status:true });
       } catch (err) {
         console.error(err);
-        res.status(400).json({ message: "Error creating category", error: err });
+        res.json({ msg: "Error creating category", data: err,status:false });
       }
     }
 
@@ -178,10 +179,10 @@ class ProductController {
       const {id, name,description } = req.body;
       try {
         const updatedCategory = await Category.findByIdAndUpdate(req.params.id, { name }, { new: true });
-        if (!updatedCategory) return res.status(404).json({ message: "Category not found" });
-        res.status(200).json({ message: "Category updated successfully", category: updatedCategory });
+        if (!updatedCategory) return res.status(404).json({ msg: "Category not found" });
+        res.json({ msg: "Category updated successfully", category: updatedCategory ,status:true});
       } catch (err) {
-        res.status(400).json({ message: "Error updating category", error: err });
+        res.json({ msg: "Error updating category", data: err ,status:false });
       }
     }
 
@@ -189,10 +190,10 @@ class ProductController {
      async deleteCategory(req, res) {
       try {
         const deletedCategory = await Category.findByIdAndDelete(req.params.id);
-        if (!deletedCategory) return res.status(404).json({ message: "Category not found" });
-        res.status(200).json({ message: "Category deleted successfully" });
+        if (!deletedCategory) return res.status(404).json({ msg: "Category not found",status:false,data:[] });
+        res.json({ msg: "Category deleted successfully",status:true,data:[] });
       } catch (err) {
-        res.status(400).json({ message: "Error deleting category", error: err });
+        res.json({ msg: "Error deleting category", data: err,status:false });
       }
     }
 
@@ -201,9 +202,9 @@ class ProductController {
       try {
         console.log("Fetching all categories...");
         const categories = await Category.find().sort({ createdAt: -1 });
-        res.status(200).json(categories);
+        res.json(categories);
       } catch (err) {
-        res.status(400).json({ message: "Error fetching categories", error: err });
+        res.json({ msg: "Error fetching categories", data: err,status:false });
       }
     }
 

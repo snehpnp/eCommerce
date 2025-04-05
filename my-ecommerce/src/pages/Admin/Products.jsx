@@ -23,7 +23,6 @@ function Sheetsets() {
   const productsPerPage = 6;
   const [loader, setLoader] = useState(false);
   const [isTableView, setIsTableView] = useState(true);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
 
   const handleChange = (event) => {
@@ -34,9 +33,15 @@ function Sheetsets() {
   const GetProducts = async () => {
     try {
       setLoader(true);
-      let FilteredProducts = {category: selectedCategory, availability: availability, priceRange: priceRange};
-      const response = await axios.get(`${Config.react_domain}/api/products`, { params: FilteredProducts });
-      setProducts(response.data);
+      let FilteredProducts = {
+        category: selectedCategory,
+        availability: availability,
+        priceRange: priceRange,
+      };
+      const response = await axios.get(`${Config.react_domain}/api/products`, {
+        params: FilteredProducts,
+      });
+      setProducts(response.data.data);
       setLoader(false);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -45,15 +50,12 @@ function Sheetsets() {
   };
 
   useEffect(() => {
-  
     fetchCategories();
-    
   }, []);
   useEffect(() => {
     GetProducts();
-    
   }, [selectedCategory]);
-  
+
   const fetchCategories = async () => {
     try {
       const res = await axios.get(`${Config.react_domain}/api/categories`);
@@ -62,8 +64,6 @@ function Sheetsets() {
       console.error("Failed to fetch categories", err);
     }
   };
-
-
 
   const handleDelete = async (id) => {
     try {

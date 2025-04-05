@@ -230,7 +230,14 @@ const BedsheetProductCards = () => {
   const GetProducts = async () => {
     try {
       const response = await axios.get(`${Config.react_domain}/api/products`);
-      setProducts(response.data);
+      if (response.data.status) {
+       
+        setProducts(response.data.data);
+      }else{
+        toast.error("Failed to fetch products", {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        });
+      }
     } catch (error) {
       console.error("Error fetching products:", error);
     }
