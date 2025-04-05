@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import {
   AppBar,
   Toolbar,
@@ -70,6 +70,8 @@ export default function ResponsiveNavbar() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const token = localStorage.getItem("token");
+
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
@@ -90,7 +92,6 @@ export default function ResponsiveNavbar() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) {
       let decoded = jwtDecode(token);
       console.log("Decoded JWT:", decoded); // Log the decoded JWT for debugging
@@ -206,6 +207,16 @@ export default function ResponsiveNavbar() {
               </Badge>
             </IconButton>
           </Box>
+
+          {token && (
+            <Box sx={{ flexGrow: 1, display: "flex", alignItems: "end" }}>
+              <IconButton color="inherit">
+                <Badge badgeContent={3} color="primary">
+                  <ShoppingCartIcon fontSize="large" />
+                </Badge>
+              </IconButton>
+            </Box>
+          )}
 
           <IconButton color="inherit" onClick={handleMenuOpen}>
             {getProfileLogo && getProfileLogo !== "" ? (

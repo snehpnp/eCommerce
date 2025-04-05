@@ -16,6 +16,7 @@ import Orders from "./Orders";
 import Users from "./Users";
 import Dashboard from "./Dashboard";
 import Products from "./Products";
+import Cattegories from "./Categories";
 
 function Sheetsets() {
   const navigate = useNavigate();
@@ -39,6 +40,15 @@ function Sheetsets() {
           </h4>
 
           <div className="d-flex flex-column gap-2">
+          <Button
+              variant="outlined"
+              onClick={() => navigate("/admin/dashboard")}
+            >
+              Dashboard
+            </Button>
+            <Button variant="outlined" onClick={() => navigate("/admin/users")}>
+              Users
+            </Button>
             <Button
               variant="outlined"
               onClick={() => navigate("/admin/products")}
@@ -53,19 +63,31 @@ function Sheetsets() {
             </Button>
             <Button
               variant="outlined"
+              onClick={() => navigate("/admin/categories")}
+            >
+              Categories
+            </Button>
+            <Button
+              variant="outlined"
               onClick={() => navigate("/admin/orders")}
             >
               Orders
             </Button>
-            <Button variant="outlined" onClick={() => navigate("/admin/users")}>
-              Users
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/admin/brands")}
+            >
+
+              Brands
             </Button>
             <Button
               variant="outlined"
-              onClick={() => navigate("/admin/dashboard")}
+              onClick={() => navigate("/admin/coupons")}
             >
-              Dashboard
+              Coupons
             </Button>
+            
+        
           </div>
 
           <hr className="my-4" />
@@ -81,6 +103,7 @@ function Sheetsets() {
             <Route path="/users" element={<Users />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/categories" element={<Cattegories />} />
           </Routes>
         </div>
       </div>

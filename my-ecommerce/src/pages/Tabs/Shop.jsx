@@ -1,117 +1,153 @@
-import React, { useState, useEffect } from "react";
-import { FaHeart, FaShoppingCart, FaTag } from "react-icons/fa"; // Classic Icons
-import img1 from "../../assets/Images/Bed Skirt.jpg";
-import img2 from "../../assets/Images/Both.jpg";
-import img3 from "../../assets/Images/Comforter Sets.jpg";
-import img4 from "../../assets/Images/dex-ezekiel-rYPW3gKsbYc-unsplash.jpg";
+import React, { useState, useEffect, useRef } from "react";
+import { FaHeart, FaShoppingCart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import axios from "axios";
 import * as Config from "../../utils/Config";
 
-const cachedProducts = [
-  {
-    id: 1,
-    name: "Bed Skirt",
-    image: img1,
-    oldPrice: 990.0,
-    newPrice: 749.0,
-    offer: "Limited Time Offer!",
-  },
-  {
-    id: 2,
-    name: "Both",
-    image: img2,
-    oldPrice: 990.0,
-    newPrice: 749.0,
-    offer: "Summer Sale - 20% Off!",
-  },
-  {
-    id: 3,
-    name: "Comforter Sets",
-    image: img3,
-    oldPrice: 990.0,
-    newPrice: 749.0,
-    offer: "",
-  },
-  {
-    id: 4,
-    name: "Premium Comforter",
-    image: img4,
-    oldPrice: 1200.0,
-    newPrice: 999.0,
-    offer: "Buy 1 Get 1 Free!",
-  },
-];
-
-function Shop({ name, home }) {
+function Shop({ name }) {
   const [products, setProducts] = useState([]);
+  const scrollRef = useRef();
 
   const GetProducts = async () => {
     try {
       const response = await axios.get(`${Config.react_domain}/api/products`);
-      const data = response.data;
-
-      setProducts(data);
+      setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
-      setProducts(cachedProducts); // Fallback to cached products in case of error
     }
   };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      await GetProducts();
-    };
-    fetchProducts();
+    GetProducts();
   }, []);
 
+  const handleAddToCart = (product) => {
+    console.log("Added to cart:", product);
+  };
+
+  const scrollLeft = () => {
+    scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
+  };
+
+  const scrollRight = () => {
+    scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
+  };
+
   return (
-    <div
-      className="container-fluid"
-      style={{ marginTop: "70px", marginBottom: "50px" }}
-    >
+    <div className="container-fluid" style={{ marginTop: "40px", marginBottom: "50px" }}>
       <h4 style={{ textAlign: "center", marginBottom: "30px" }}>
         <strong>{name}</strong>
       </h4>
-      <main className="main bd-grid">
-        {products.map((product) => (
-          <article className="card" key={product.id}>
-            <div className="card__img">
+
+      {/* Scroll Arrows */}
+      <div style={{ position: "relative" }}>
+        <FaChevronLeft
+          onClick={scrollLeft}
+          style={{
+            position: "absolute",
+            top: "40%",
+            left: 0,
+            zIndex: 1,
+            fontSize: "25px",
+            cursor: "pointer",
+            color: "#333",
+            background: "#fff",
+            padding: "10px",
+            borderRadius: "50%",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+          }}
+        />
+        <FaChevronRight
+          onClick={scrollRight}
+          style={{
+            position: "absolute",
+            top: "40%",
+            right: 0,
+            zIndex: 1,
+            fontSize: "25px",
+            cursor: "pointer",
+            color: "#333",
+            background: "#fff",
+            padding: "10px",
+            borderRadius: "50%",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+          }}
+        />
+
+        {/* Product Scroll Area */}
+        <div
+  ref={scrollRef}
+  style={{
+    display: "flex",
+    overflowX: "scroll", // <-- changed here
+    gap: "20px",
+    padding: "20px 40px",
+    scrollBehavior: "smooth",
+  }}
+  className="custom-scroll"
+>
+
+          {products.map((product) => (
+            <div
+              key={product.id}
+              style={{
+                flex: "0 0 250px",
+                border: "1px solid #ddd",
+                padding: "15px",
+                borderRadius: "10px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                backgroundColor: "#fff",
+              }}
+            >
               <img
                 src={product.mainImage}
                 alt={product.name}
-                className="card__img"
+                style={{
+                  width: "100%",
+                  height: "180px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
               />
-            </div>
-            <div className="card__name">
-              <p>{product.name}</p>
-            </div>
-            <div className="card__precis">
-              <FaHeart
-                className="icon"
-                style={{ color: "red", cursor: "pointer" }}
-              />
-              <div>
-                <span
-                  className="card__preci card__preci--before"
-                  style={{ textDecoration: "line-through", color: "gray" }}
-                >
-                  ${product.price.toFixed(2) - 100}
-                </span>
-                <span
-                  className="card__preci card__preci--now"
-                  style={{ color: "red", fontWeight: "bold" }}
-                >
-                  ${product.price.toFixed(2)}
-                </span>
+              <p style={{ fontSize: "18px", fontWeight: "bold", margin: "10px 0" }}>
+                {product.name}
+              </p>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <FaHeart style={{ color: "red", cursor: "pointer" }} />
+                <div>
+                  <span style={{ textDecoration: "line-through", color: "gray", marginRight: "8px" }}>
+                    ${product.price.toFixed(2) - 100}
+                  </span>
+                  <span style={{ color: "red", fontWeight: "bold" }}>
+                    ${product.price.toFixed(2)}
+                  </span>
+                </div>
               </div>
-              <div className="card__name">{product.name}</div>
-              <FaShoppingCart
-                className="icon"
-                style={{ color: "green", cursor: "pointer" }}
-              />
+              <button
+                onClick={() => handleAddToCart(product)}
+                style={{
+                  marginTop: "15px",
+                  width: "100%",
+                  padding: "10px",
+                  backgroundColor: "#28a745",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  fontWeight: "bold",
+                }}
+              >
+                <FaShoppingCart /> Add to Cart
+              </button>
             </div>
-          </article>
-        ))}
-      </main>
+          ))}
+        </div>
+      </div>
+
+  
     </div>
   );
 }

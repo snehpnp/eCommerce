@@ -47,9 +47,7 @@ const productSchema = new mongoose.Schema({
   warranty: {
     type: String,
   },
-  size: {
-    type: String,
-  },
+ 
   quantity: {
     type: Number,
     required: true,
@@ -61,9 +59,8 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  color: {
-    type: String,
-  },
+size: [String],            // ✅ Array of sizes
+  color: [String],
 });
 
 const Product = mongoose.model("Product", productSchema);

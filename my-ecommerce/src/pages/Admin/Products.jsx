@@ -70,25 +70,39 @@ function Sheetsets() {
  
 
         <div className="col-lg-12">
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div className="d-flex align-items-center gap-2">
-              <label style={{ fontWeight: "bold" }}>Sort By:</label>
-              <select onChange={(e) => setSortOrder(e.target.value)} className="form-select">
-                <option value="default">Default</option>
-                <option value="asc">A to Z</option>
-                <option value="desc">Z to A</option>
-              </select>
-            </div>
 
-            <div className="d-flex align-items-center gap-2">
-              <Switch checked={isTableView} onChange={handleChange} />
-              <span>{isTableView ? "Table View" : "Card View"}</span>
-            </div>
+<div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+  <h2 style={{ margin: 0, flex: "1 1 auto" }}>
+    <span role="img" aria-label="products">📦</span> Products
+   </h2>
 
-            <Button variant="contained" startIcon={<Add />} onClick={() => navigate("/admin/add-product")}>
-              Add Product
-            </Button>
-          </div>
+  <div className="d-flex align-items-center gap-2">
+    <label style={{ fontWeight: "bold" }}>Sort By:</label>
+    <select
+      onChange={(e) => setSortOrder(e.target.value)}
+      className="form-select"
+      style={{ minWidth: "150px" }}
+    >
+      <option value="default">Default</option>
+      <option value="asc">A to Z</option>
+      <option value="desc">Z to A</option>
+    </select>
+  </div>
+
+  <div className="d-flex align-items-center gap-2">
+    <Switch checked={isTableView} onChange={handleChange} />
+    <span>{isTableView ? "Table View" : "Card View"}</span>
+  </div>
+
+  <Button
+    variant="contained"
+    startIcon={<Add />}
+    onClick={() => navigate("/admin/add-product")}
+  >
+    Add Product
+  </Button>
+</div>
+
 
           {loader ? (
             <Box sx={{ height: "50vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
