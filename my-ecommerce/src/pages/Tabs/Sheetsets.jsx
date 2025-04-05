@@ -38,10 +38,11 @@ function Sheetsets({path}) {
 
   return (
     <div className="container-fluid">
-      {/* <h1 className="text-center my-4" style={{ fontWeight: "bold" }}>
-       {path?path: "Sheet Sets Collection"}
-      </h1> */}
+
       <div className="row">
+
+
+      
         <div
           className="col-lg-2"
           style={{
