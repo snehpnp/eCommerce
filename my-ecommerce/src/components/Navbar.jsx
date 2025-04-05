@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ShoppingCart from '@mui/icons-material/ShoppingCart';
+
 import {
   AppBar,
   Toolbar,
@@ -70,6 +72,7 @@ export default function ResponsiveNavbar() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [userRole, setUserRole] = useState(null);
+  const [CartCount, setCartCount] = useState(0);
 
   const token = localStorage.getItem("token");
 
@@ -108,6 +111,7 @@ export default function ResponsiveNavbar() {
         .then((response) => {
           if (response.data.status) {
             setGetProfileLogo(response.data.data);
+            setCartCount(response.data.cartCount); // Assuming the API returns the cart count
           } else {
             console.error(
               "Failed to fetch profile data:",
@@ -220,7 +224,7 @@ export default function ResponsiveNavbar() {
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 <IconButton color="inherit">
-                  <Badge badgeContent={3} color="primary">
+                  <Badge badgeContent={CartCount} color="primary">
                     <ShoppingCartIcon fontSize="large" />
                   </Badge>
                 </IconButton>
@@ -250,44 +254,68 @@ export default function ResponsiveNavbar() {
           </IconButton>
 
           <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            PaperProps={{
-              sx: {
-                mt: 1.5,
-                borderRadius: 2,
-                minWidth: 180,
-                boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
-              },
-            }}
-          >
-            <MenuItem onClick={handleMenuClose}>
-              <AccountCircle sx={{ mr: 1 }} />
-              Profile
-            </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
-              <Settings sx={{ mr: 1 }} />
-              Settings
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleMenuClose();
-                Logout();
-              }}
-            >
-              <LogoutIcon sx={{ mr: 1 }} />
-              Logout
-            </MenuItem>
-          </Menu>
+  anchorEl={anchorEl}
+  open={Boolean(anchorEl)}
+  onClose={handleMenuClose}
+  anchorOrigin={{
+    vertical: "bottom",
+    horizontal: "right",
+  }}
+  transformOrigin={{
+    vertical: "top",
+    horizontal: "right",
+  }}
+  PaperProps={{
+    sx: {
+      mt: 1.5,
+      borderRadius: 3,
+      minWidth: 240,
+      px: 1,
+      boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+      fontFamily: "sans-serif",
+    },
+  }}
+>
+  <MenuItem onClick={handleMenuClose} sx={{ py: 1.5 }}>
+    <AccountCircle sx={{ mr: 1.5 }} />
+    <span style={{ fontSize: "16px" }}>Profile</span>
+  </MenuItem>
+
+  <Link to="/favorite" style={{ textDecoration: "none", color: "inherit" }}>
+    <MenuItem onClick={handleMenuClose} sx={{ py: 1.5 }}>
+      <MailIcon sx={{ mr: 1.5 }} />
+      <span style={{ fontSize: "16px" }}>Favorite Products</span>
+    </MenuItem>
+  </Link>
+
+  <Link to="/cart" style={{ textDecoration: "none", color: "inherit" }}>
+    <MenuItem onClick={handleMenuClose} sx={{ py: 1.5 }}>
+      <ShoppingCart sx={{ mr: 1.5 }} />
+      <span style={{ fontSize: "16px" }}>My Cart</span>
+    </MenuItem>
+  </Link>
+
+  <MenuItem onClick={handleMenuClose} sx={{ py: 1.5 }}>
+    <Settings sx={{ mr: 1.5 }} />
+    <span style={{ fontSize: "16px" }}>Settings</span>
+  </MenuItem>
+
+  <MenuItem
+    onClick={() => {
+      handleMenuClose();
+      Logout();
+    }}
+    sx={{
+      py: 1.5,
+      color: "red",
+      fontWeight: 500,
+    }}
+  >
+    <LogoutIcon sx={{ mr: 1.5 }} />
+    <span style={{ fontSize: "16px" }}>Logout</span>
+  </MenuItem>
+</Menu>
+
         </Toolbar>
       </AppBar>
 

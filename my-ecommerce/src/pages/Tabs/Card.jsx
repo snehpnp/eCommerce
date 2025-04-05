@@ -1,75 +1,18 @@
-import React, { useState } from "react";
-
-const products = [
-  {
-    id: 1,
-    brand: "DreamHome",
-    name: "Cotton Bedsheet",
-    size: "Queen Size",
-    description: "Soft and breathable cotton bedsheet with vibrant prints.",
-    images: [
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510684/Mattress_Protector_i7qke7.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510684/nathan-waters-zukdSYdFB_A-unsplash_ujnrjw.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510683/jacinta-christos-BDJy8J3R4GY-unsplash_fjhzkd.jpg",
-    ],
-    price: 1200,
-    discount: 20,
-  },
-  {
-    id: 2,
-    brand: "SleepWell",
-    name: "Silk Bedsheet",
-    size: "King Size",
-    description: "Luxurious silk bedsheet for premium comfort.",
-    images: [
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510683/jacinta-christos-BDJy8J3R4GY-unsplash_fjhzkd.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510684/Mattress_Protector_i7qke7.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510684/nathan-waters-zukdSYdFB_A-unsplash_ujnrjw.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510683/jacinta-christos-BDJy8J3R4GY-unsplash_fjhzkd.jpg"
-    ],
-    price: 2200,
-    discount: 15,
-  },
-  {
-    id: 3,
-    brand: "CozyNest",
-    name: "Linen Bedsheet",
-    size: "Single Size",
-    description: "Durable and stylish linen bedsheet for daily use.",
-    images: [
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510684/nathan-waters-zukdSYdFB_A-unsplash_ujnrjw.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510684/Mattress_Protector_i7qke7.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510683/jacinta-christos-BDJy8J3R4GY-unsplash_fjhzkd.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510439/Couple_nbbuxc.jpg"
-    ],
-    price: 999,
-    discount: 10,
-  },
-  {
-    id: 4,
-    brand: "HomeStyle",
-    name: "Floral Bedsheet",
-    size: "Double Size",
-    description: "Beautiful floral bedsheet to brighten up your room.",
-
-    images: [
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510683/jacinta-christos-BDJy8J3R4GY-unsplash_fjhzkd.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510684/Mattress_Protector_i7qke7.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510684/nathan-waters-zukdSYdFB_A-unsplash_ujnrjw.jpg",
-      "https://res.cloudinary.com/dkqw7zkzl/image/upload/v1743510439/Couple_nbbuxc.jpg"
-    ],
-    price: 1500,
-    discount: 25,
-  }
-];
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import * as Config from "../../utils/Config";
+import { ToastContainer, toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
 
 const BedsheetProductCards = () => {
   const [likes, setLikes] = useState({});
   const [imageIndex, setImageIndex] = useState({});
+  const [products, setProducts] = useState([]);
 
   const toggleLike = (id) => {
     setLikes((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+  let Token = localStorage.getItem("token");
 
   const handleImageScroll = (productId, dir, total) => {
     setImageIndex((prev) => {
@@ -102,12 +45,35 @@ const BedsheetProductCards = () => {
     zIndex: 1,
   });
 
+  const AddToCart = async (product) => {
+    const decoded = jwtDecode(Token);
+
+    let data = {
+      userId: decoded.id,
+      productId: product._id,
+    };
+
+    const responseData = await axios.post(
+      `${Config.react_domain}/api/addtocart`,
+      data
+    );
+    if (responseData.data.status) {
+      toast.success("Product added to cart successfully", {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+    } else {
+      toast.error("Product already in cart", {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
+    }
+  };
+
   const Card = ({ product }) => {
-    const currentImgIndex = imageIndex[product.id] || 0;
+    const currentImgIndex = imageIndex[product._id] || 0;
 
     return (
       <div
-        key={product.id}
+        key={product._id}
         style={{
           background: "#fff",
           width: "100%",
@@ -124,7 +90,7 @@ const BedsheetProductCards = () => {
         {/* Image Carousel */}
         <div style={{ position: "relative", height: "220px" }}>
           <img
-            src={product.images[currentImgIndex]}
+            src={product.allImages[currentImgIndex]}
             alt="product"
             style={{
               width: "100%",
@@ -132,22 +98,22 @@ const BedsheetProductCards = () => {
               objectFit: "cover",
             }}
           />
-          <button
+          <span
             onClick={() =>
-              handleImageScroll(product.id, "left", product.images.length)
+              handleImageScroll(product._id, "left", product.allImages.length)
             }
             style={arrowButtonStyle("left")}
           >
-            ◀
-          </button>
-          <button
+            {"<"}
+          </span>
+          <span
             onClick={() =>
-              handleImageScroll(product.id, "right", product.images.length)
+              handleImageScroll(product._id, "right", product.allImages.length)
             }
             style={arrowButtonStyle("right")}
           >
-            ▶
-          </button>
+            {">"}
+          </span>
         </div>
 
         {/* Product Info */}
@@ -163,9 +129,7 @@ const BedsheetProductCards = () => {
           >
             {truncateDescription(product.description, 50)}
           </p>
-          <p style={{ margin: "4px 0", color: "#555" }}>
-            Size: {product.size}
-          </p>
+          <p style={{ margin: "4px 0", color: "#555" }}>Size: {product.size}</p>
           <div
             style={{
               display: "flex",
@@ -183,7 +147,7 @@ const BedsheetProductCards = () => {
               >
                 ₹
                 {product.price -
-                  (product.price * product.discount) / 100}
+                  (product.price * product?.discount || 10) / 100}
               </span>
               <span
                 style={{
@@ -205,7 +169,7 @@ const BedsheetProductCards = () => {
                 borderRadius: "4px",
               }}
             >
-              {product.discount}% OFF
+              {product?.discount || 10}% OFF
             </span>
           </div>
 
@@ -217,6 +181,7 @@ const BedsheetProductCards = () => {
             }}
           >
             <button
+              onClick={() => AddToCart(product)}
               style={{
                 padding: "8px 16px",
                 backgroundColor: "#2196F3",
@@ -229,13 +194,29 @@ const BedsheetProductCards = () => {
               Add to Cart
             </button>
             <button
-              onClick={() => toggleLike(product.id)}
+              onClick={() => toggleLike(product._id)}
               style={{
-                background: "none",
-                border: "none",
+                background: "#fff",
+                border: likes[product._id] ? "1px solid red" : "1px solid #ccc",
+                borderRadius: "50%",
                 fontSize: "20px",
-                color: likes[product.id] ? "red" : "#888",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: likes[product._id] ? "red" : "#888",
                 cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: likes[product._id]
+                  ? "0 0 10px rgba(255, 0, 0, 0.3)"
+                  : "0 0 6px rgba(0,0,0,0.1)",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = "scale(1.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = "scale(1)";
               }}
             >
               ♥
@@ -246,20 +227,39 @@ const BedsheetProductCards = () => {
     );
   };
 
+  const GetProducts = async () => {
+    try {
+      const response = await axios.get(`${Config.react_domain}/api/products`);
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  useEffect(() => {
+    GetProducts();
+  }, []);
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "20px",
-        justifyContent: "center",
-        padding: "16px",
-      }}
-    >
-      {products.map((product) => (
-        <Card key={product.id} product={product} />
-      ))}
-    </div>
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "20px",
+          justifyContent: "center",
+          padding: "16px",
+        }}
+      >
+        {products.map((product) => (
+          <Card key={product.id} product={product} />
+        ))}
+      </div>
+
+      <div className="grid place-items-center h-dvh bg-zinc-900/15">
+        <ToastContainer />
+      </div>
+    </>
   );
 };
 

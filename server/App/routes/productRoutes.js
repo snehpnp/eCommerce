@@ -1,6 +1,8 @@
 const express = require("express");
 const ProductController = require("../controllers/productController");
 
+const ProductOther = require("../controllers/Productother");
+
 const router = express.Router();
 
 router.post("/product", ProductController.createProduct);
@@ -15,5 +17,20 @@ router.get("/categories", ProductController.getAllCategories);
 
 router.put("/categories/:id", ProductController.editCategory);
 router.delete("/categories/:id", ProductController.deleteCategory);
+
+router.post("/addtocart", ProductOther.AddtoCart);
+router.get("/cart", ProductOther.getCart);
+router.post("/cart/delete", ProductOther.deleteCartItem);
+
+
+router.post("/addfav", ProductOther.addFavorite);
+
+router.get("/fav", ProductOther.getFavorite);
+
+router.post("/fav/delete", ProductOther.deleteFavorite);
+router.post("/updatecart/qty", ProductOther.UpdateCartQuantity);
+
+
+
 
 module.exports = router;

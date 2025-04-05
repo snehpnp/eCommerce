@@ -7,6 +7,7 @@ import Sheetsets from "../pages/Tabs/Sheetsets";
 import Products from "../pages/Admin/Main";
 
 import Cart from "../pages/Tabs/Cart";
+import Favorite from "../pages/Tabs/Favorite";
 
 function App() {
   return (
@@ -50,6 +51,9 @@ function App() {
               <Route path="/admin/*" element={<Products />} />
 
               <Route path="/cart" element={<Cart />} />
+              <Route path="/favorite" element={<Favorite />} />
+
+              {/* 404 Page */}
             </Routes>
           </div>
         </main>

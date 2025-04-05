@@ -92,7 +92,6 @@ class ProductController {
  
       let CategoryId = req.query.category || null;
 
-console.log("CategoryId:", CategoryId);
 
       let query = {};
 

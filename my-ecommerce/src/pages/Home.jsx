@@ -26,7 +26,7 @@ const Home = () => {
 
           <Card />
         </div>
-        <Shop name={"Flat Bedsheets"} home={true} />
+        {/* <Shop name={"Flat Bedsheets"} home={true} /> */}
 
         <HomeCarousel />
       </div>

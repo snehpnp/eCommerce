@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const User = require("../models/User");
 const Role = require("../models/Role");
+const Cart = require("../models/Cart");
+
 const admin = require("firebase-admin");
 const CommanMail = require("../utils/Commanmail");
 
@@ -267,7 +269,6 @@ class AuthController {
     try {
       const { email, password } = req.body;
 
-      console.log("Login request body:", req.body);
       const user = await User.findOne({ email });
 
       if (!user) {
@@ -469,9 +470,13 @@ class AuthController {
       );
       if (!UserFind) return res.json({ message: "User not found" });
 
+      const CartData = await Cart.findOne({ userId: decoded.id });
+
+
       return res.send({
         status: true,
         data: UserFind.profilePic,
+        cartCount: CartData && CartData?.products?.length,
         message: "Profile photo fetched successfully",
       });
     } catch (error) {
