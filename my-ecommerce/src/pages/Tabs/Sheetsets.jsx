@@ -1,19 +1,19 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import * as Config from "../../utils/Config";
 
-function Sheetsets({path}) {
+function Sheetsets({ path }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [viewMode, setViewMode] = useState("card");
   const [sortOrder, setSortOrder] = useState("default");
   const [availability, setAvailability] = useState("all");
   const [priceRange, setPriceRange] = useState(200);
   const [products, setProducts] = useState([]);
-  
 
   const GetProducts = async () => {
     try {
-      const response = await axios.get(`${Config.react_domain}/api/products`);
+      let Filter = { category: path };
+      const response = await axios.get(`${Config.react_domain}/api/products`, { params: Filter });
       const data = response.data;
 
       selectedCategory === "All"
@@ -34,15 +34,125 @@ function Sheetsets({path}) {
     };
     fetchProducts();
   }, []);
+  const CardView = ({ products }) => {
+    return (
+      <div
+        className="product-container"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+          gap: "20px",
+          marginTop: "20px",
+        }}
+      >
+        {products.map((product) => (
+          <div
+            key={product._id}
+            className="product-card1 shadow-sm"
+            style={{
+              background: "#fff",
+              border: "1px solid #eee",
+              borderRadius: "10px",
+              padding: "20px",
+              boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            {/* Images */}
+            <div
+              style={{
+                overflowX: "auto",
+                whiteSpace: "nowrap",
+                marginBottom: "10px",
+              }}
+            >
+              {product.allImages?.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  alt={`product-${i}`}
+                  style={{
+                    width: "100%",
+                    maxHeight: "250px",
+                    objectFit: "cover",
+                    borderRadius: "6px",
+                    marginBottom: "8px",
+                  }}
+                />
+              ))}
+            </div>
 
+            {/* Info */}
+            <h5 style={{ fontWeight: "bold" }}>{product.name}</h5>
+            <p style={{ fontSize: "14px", color: "#666" }}>
+              {product.description}
+            </p>
+            <p style={{ fontWeight: "bold", color: "#28a745" }}>
+              ${product.price.toFixed(2)}
+            </p>
 
+            {/* Buttons */}
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button className="btn btn-outline-secondary btn-sm">❤️</button>
+              <button className="btn btn-primary btn-sm">Add to Cart</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+  const TableView = ({ products }) => {
+    return (
+      <div style={{ overflowX: "auto", marginTop: "20px" }}>
+        <table className="table table-bordered table-striped">
+          <thead className="thead-dark">
+            <tr>
+              <th>Images</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Price ($)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product._id}>
+                <td style={{ whiteSpace: "nowrap" }}>
+                  {product.allImages?.slice(0, 2).map((img, i) => (
+                    <img
+                      key={i}
+                      src={img}
+                      alt={`product-${i}`}
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        objectFit: "cover",
+                        marginRight: "5px",
+                        borderRadius: "5px",
+                      }}
+                    />
+                  ))}
+                </td>
+                <td>{product.name}</td>
+                <td>{product.description}</td>
+                <td>{product.price.toFixed(2)}</td>
+                <td>
+                  <button className="btn btn-outline-secondary btn-sm me-2">❤️</button>
+                  <button className="btn btn-primary btn-sm">Add to Cart</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+  
   return (
     <div className="container-fluid">
-
       <div className="row">
-
-
-      
         <div
           className="col-lg-2"
           style={{
@@ -260,77 +370,9 @@ function Sheetsets({path}) {
 
           <div className="product-list">
             {viewMode === "card" ? (
-              <div className="product-container">
-                {products.map((product) => (
-                  <div key={product._id} className="product-card">
-                    <img
-                      src={product.mainImage}
-                      alt={product.name}
-                      className="product-image"
-                    />
-                    <h3>{product.name}</h3>
-                    <p>{product.description}</p>
-                    <div>
-                      {product.price
-                        ? (
-                        <>
-                          <span className="original-price">
-                            ${product.price
-                              .toFixed(2)}
-                          </span>
-                          <span className="discount-price">
-                            ${product.price
-                              .toFixed(2)}
-                          </span>
-                        </>
-                      ) : (
-                        <span>${product.price.toFixed(2)}</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <CardView products={products} />
             ) : (
-              <table className="product-table">
-                <thead>
-                  <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        <img
-                          src={product.mainImage}
-                          alt={product.name}
-                          className="table-image"
-                        />
-                      </td>
-                      <td>{product.name}</td>
-                      <td>{product.description}</td>
-                      <td>
-                        {product.price
-                          ? (
-                          <>
-                            <span className="original-price">
-                              ${product.price.toFixed(2)}
-                            </span>
-                            <span className="discount-price">
-                              ${product.price.toFixed(2)}
-                            </span>
-                          </>
-                        ) : (
-                          <span>${product.price.toFixed(2)}</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <TableView products={products} />
             )}
           </div>
         </div>

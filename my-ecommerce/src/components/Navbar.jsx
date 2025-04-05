@@ -80,7 +80,7 @@ export default function ResponsiveNavbar() {
   const [getProfileLogo, setGetProfileLogo] = useState(null);
 
   let navLinks = [
-    { name: "Bedsheet Sets", path: "/bedsheet-sets" },
+    { name: "Bedsheet Sets", path: "/bedsheets" },
     { name: "Pillow Covers", path: "/pillow-covers" },
     { name: "Blanket Covers", path: "/blanket-covers" },
     { name: "Mattress Protectors", path: "/mattress-protectors" },

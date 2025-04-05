@@ -89,7 +89,28 @@ class ProductController {
   // Get all products
    async getAllProducts(req, res) {
     try {
-      const products = await Product.find().sort({ createdAt: -1 });
+ 
+      let CategoryId = req.query.category || null;
+
+console.log("CategoryId:", CategoryId);
+
+      let query = {};
+
+
+      if (CategoryId && CategoryId != "All")  {
+          if(CategoryId == "pillow-covers") {
+            query.category = { $regex: new RegExp(`^${"Pillow Covers"}$`, 'i') };
+
+          }else {
+
+            query.category = { $regex: new RegExp(`^${CategoryId}$`, 'i') };
+          }
+
+
+      }
+      
+
+      const products = await Product.find(query).sort({ createdAt: -1 });
       res.status(200).json(products);
     } catch (err) {
       res.status(400).json({ message: "Error fetching products", error: err });

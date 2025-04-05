@@ -188,7 +188,35 @@ const AddProduct = () => {
             className="form-control"
           />
         </div>
-
+   {/* Category and Fabric */}
+   <div className="row">
+          <div className="col-md-6 mb-3">
+            <label>Category:</label>
+            <select
+              name="category"
+              value={product.category}
+              onChange={handleChange}
+              className="form-select"
+            >
+              <option value="">Select Category</option>
+              {categories.map((category) => (
+                <option key={category._id} value={category.name}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col-md-6 mb-3">
+            <label>Fabric Quality:</label>
+            <input
+              type="text"
+              name="fabricQuality"
+              value={product.fabricQuality}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+        </div>
         {/* Warranty / Quantity */}
         <div className="row">
           <div className="col-md-6 mb-3">
@@ -275,35 +303,7 @@ const AddProduct = () => {
           </button>
         </div>
 
-        {/* Category and Fabric */}
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label>Category:</label>
-            <select
-              name="category"
-              value={product.category}
-              onChange={handleChange}
-              className="form-select"
-            >
-              <option value="">Select Category</option>
-              {categories.map((category) => (
-                <option key={category._id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="col-md-6 mb-3">
-            <label>Fabric Quality:</label>
-            <input
-              type="text"
-              name="fabricQuality"
-              value={product.fabricQuality}
-              onChange={handleChange}
-              className="form-control"
-            />
-          </div>
-        </div>
+     
 
         {/* Images */}
         <div className="mb-3">

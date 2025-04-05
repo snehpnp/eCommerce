@@ -18,8 +18,8 @@ function App() {
           <Route path="/" element={<Home />} />
 
           <Route
-            path="/bedsheet-sets"
-            element={<Sheetsets path="bedsheet-sets" />}
+            path="/bedsheets"
+            element={<Sheetsets path="bedsheets" />}
           />
           <Route
             path="/pillow-covers"
@@ -44,10 +44,7 @@ function App() {
 
           <Route path="/admin/*" element={<Products />} />
 
-          {/* <Route path="/admin/add-product" element={<AddProduct />} />
-
-          <Route path="/admin/orders" element={<Orders />} />
-          <Route path="/admin/dashboard" element={<Dashboard />} /> */}
+         
           <Route path="/cart" element={<Cart />} />
         </Routes>
       </div>

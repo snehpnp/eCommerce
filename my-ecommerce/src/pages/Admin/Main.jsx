@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import * as Config from "../../utils/Config";
 import {
   Button,
-  IconButton,
-  CircularProgress,
-  Box,
-  Switch,
 } from "@mui/material";
-import { Add, Edit, Delete } from "@mui/icons-material";
 import { useNavigate, Routes, Route } from "react-router-dom";
 
 import AddProduct from "./Addproduct";
@@ -17,7 +10,7 @@ import Users from "./Users";
 import Dashboard from "./Dashboard";
 import Products from "./Products";
 import Cattegories from "./Categories";
-
+import EditProduct from "./EditProduct";
 function Sheetsets() {
   const navigate = useNavigate();
   const [priceRange, setPriceRange] = useState(200);
@@ -104,6 +97,7 @@ function Sheetsets() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/products" element={<Products />} />
             <Route path="/categories" element={<Cattegories />} />
+            <Route path="/edit-product/:id" element={<EditProduct />} />
           </Routes>
         </div>
       </div>

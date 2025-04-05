@@ -11,12 +11,6 @@ import {
 import { Add, Edit, Delete } from "@mui/icons-material";
 import { useNavigate, Routes, Route } from "react-router-dom";
 
-import AddProduct from "./Addproduct";
-import Orders from "./Orders";
-import Users from "./Users";
-import Dashboard from "./Dashboard";
-import Products from "./Products";
-
 function Sheetsets() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -29,6 +23,8 @@ function Sheetsets() {
   const productsPerPage = 6;
   const [loader, setLoader] = useState(false);
   const [isTableView, setIsTableView] = useState(true);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const handleChange = (event) => {
     setIsTableView(event.target.checked);
@@ -38,7 +34,8 @@ function Sheetsets() {
   const GetProducts = async () => {
     try {
       setLoader(true);
-      const response = await axios.get(`${Config.react_domain}/api/products`);
+      let FilteredProducts = {category: selectedCategory, availability: availability, priceRange: priceRange};
+      const response = await axios.get(`${Config.react_domain}/api/products`, { params: FilteredProducts });
       setProducts(response.data);
       setLoader(false);
     } catch (error) {
@@ -48,8 +45,25 @@ function Sheetsets() {
   };
 
   useEffect(() => {
-    GetProducts();
+  
+    fetchCategories();
+    
   }, []);
+  useEffect(() => {
+    GetProducts();
+    
+  }, [selectedCategory]);
+  
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`${Config.react_domain}/api/categories`);
+      setCategories(res.data);
+    } catch (err) {
+      console.error("Failed to fetch categories", err);
+    }
+  };
+
+
 
   const handleDelete = async (id) => {
     try {
@@ -71,20 +85,22 @@ function Sheetsets() {
 
   return (
     <div className="col-lg-12">
-      <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
-        <h2 style={{ margin: 0, flex: "1 1 auto" }}>
-          <span role="img" aria-label="products">
-            📦
-          </span>{" "}
-          Products
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        {/* Title */}
+        <h2
+          className="mb-0 d-flex align-items-center"
+          style={{ flex: "1 1 200px" }}
+        >
+          📦 Products
         </h2>
 
+        {/* Sort */}
         <div className="d-flex align-items-center gap-2">
-          <label style={{ fontWeight: "bold" }}>Sort By:</label>
+          <label className="fw-bold mb-0">Sort By:</label>
           <select
             onChange={(e) => setSortOrder(e.target.value)}
-            className="form-select"
-            style={{ minWidth: "150px" }}
+            className="form-select form-select-sm"
+            style={{ minWidth: "120px" }}
           >
             <option value="default">Default</option>
             <option value="asc">A to Z</option>
@@ -92,14 +108,55 @@ function Sheetsets() {
           </select>
         </div>
 
+        {/* Category */}
         <div className="d-flex align-items-center gap-2">
-          <Switch checked={isTableView} onChange={handleChange} />
-          <span>{isTableView ? "Table View" : "Card View"}</span>
+          <label className="fw-bold mb-0">Category:</label>
+          <select
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="form-select form-select-sm"
+            style={{ minWidth: "130px" }}
+          >
+            <option value="All">All</option>
+            {categories.map((category) => (
+              <option key={category._id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
 
+        {/* Search */}
+        <div className="d-flex align-items-center gap-2">
+          <label className="fw-bold mb-0">Search:</label>
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="form-control form-control-sm"
+            style={{ minWidth: "180px" }}
+            onChange={(e) => {
+              const searchTerm = e.target.value.toLowerCase();
+              setProducts((prevProducts) =>
+                prevProducts.filter((product) =>
+                  product.name.toLowerCase().includes(searchTerm)
+                )
+              );
+            }}
+          />
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="d-flex align-items-center gap-2">
+          <Switch checked={isTableView} onChange={handleChange} />
+          <span className="small">
+            {isTableView ? "Table View" : "Card View"}
+          </span>
+        </div>
+
+        {/* Add Button */}
         <Button
           variant="contained"
           startIcon={<Add />}
+          size="small"
           onClick={() => navigate("/admin/add-product")}
         >
           Add Product
@@ -143,7 +200,9 @@ function Sheetsets() {
                 <div className="card-footer d-flex justify-content-between">
                   <IconButton
                     color="primary"
-                    onClick={() => alert("Edit product: " + product._id)}
+                    onClick={() =>
+                      navigate(`/admin/edit-product/${product._id}`)
+                    }
                   >
                     <Edit />
                   </IconButton>
@@ -190,7 +249,9 @@ function Sheetsets() {
                 <td>
                   <IconButton
                     color="primary"
-                    onClick={() => alert("Edit product: " + product._id)}
+                    onClick={() =>
+                      navigate(`/admin/edit-product/${product._id}`)
+                    }
                   >
                     <Edit />
                   </IconButton>
