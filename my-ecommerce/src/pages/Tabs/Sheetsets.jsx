@@ -3,7 +3,7 @@ import axios from "axios";
 import * as Config from "../../utils/Config";
 import { ToastContainer, toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
-import {fetchAllProducts} from "../../features/api/User"
+import { fetchAllProducts } from "../../features/api/User";
 import { useDispatch } from "react-redux";
 
 function Sheetsets({ path }) {
@@ -23,26 +23,24 @@ function Sheetsets({ path }) {
     try {
       let Filter = { category: path };
 
-  
-      
-      const response = await axios.get(`${Config.react_domain}/api/products`, {
-        params: Filter,
-      });
-      const data = response.data.data;
+      fetchAllProducts({ Filter })
+        .then((response) => {
+          if (response.data.status) {
+            const data = response.data.data;
 
-      console.log("Products fetched:", data);
+            selectedCategory === "All"
+              ? setProducts(data)
+              : setProducts(
+                  data.filter(
+                    (product) => product.category === selectedCategory
+                  )
+                );
 
-      selectedCategory === "All"
-        ? setProducts(data)
-        : setProducts(
-            data.filter((product) => product.category === selectedCategory)
-          );
-
-      setProducts(data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setProducts(); // Fallback to cached products in case of error
-    }
+            setProducts(data);
+          }
+        })
+        .catch((error) => {});
+    } catch (error) {}
   };
 
   const fetchCategories = async () => {
@@ -116,7 +114,7 @@ function Sheetsets({ path }) {
   const Card = ({ product }) => {
     const [imageFade, setImageFade] = useState(false);
     const currentImgIndex = imageIndex[product._id] || 0;
-  
+
     const handleImageScrollWithAnimation = (productId, direction, length) => {
       setImageFade(true);
       setTimeout(() => {
@@ -124,11 +122,11 @@ function Sheetsets({ path }) {
         setImageFade(false);
       }, 200);
     };
-  
+
     const truncateDescription = (desc = "", limit = 30) => {
       return desc.length > limit ? desc.slice(0, limit) + "..." : desc;
     };
-  
+
     return (
       <div
         key={product._id}
@@ -171,7 +169,11 @@ function Sheetsets({ path }) {
           />
           <span
             onClick={() =>
-              handleImageScrollWithAnimation(product._id, "left", product.allImages.length)
+              handleImageScrollWithAnimation(
+                product._id,
+                "left",
+                product.allImages.length
+              )
             }
             style={arrowButtonStyle("left")}
           >
@@ -179,16 +181,28 @@ function Sheetsets({ path }) {
           </span>
           <span
             onClick={() =>
-              handleImageScrollWithAnimation(product._id, "right", product.allImages.length)
+              handleImageScrollWithAnimation(
+                product._id,
+                "right",
+                product.allImages.length
+              )
             }
             style={arrowButtonStyle("right")}
           >
             {">"}
           </span>
         </div>
-  
+
         {/* Product Info */}
-        <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div
+          style={{
+            padding: "16px",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
           <div>
             <h4 style={{ margin: 0, color: "#666" }}>{product.brand}</h4>
             <h3 style={{ margin: "4px 0" }}>{product.name}</h3>
@@ -203,7 +217,9 @@ function Sheetsets({ path }) {
             >
               {truncateDescription(product.description, 60)}
             </p>
-            <p style={{ margin: "4px 0", color: "#555" }}>Size: {product.size}</p>
+            <p style={{ margin: "4px 0", color: "#555" }}>
+              Size: {product.size}
+            </p>
             <div
               style={{
                 display: "flex",
@@ -248,7 +264,7 @@ function Sheetsets({ path }) {
               </span>
             </div>
           </div>
-  
+
           {/* Buttons */}
           <div
             style={{
@@ -303,7 +319,7 @@ function Sheetsets({ path }) {
       </div>
     );
   };
-  
+
   const arrowButtonStyle = (side) => ({
     position: "absolute",
     [side]: "10px",
@@ -565,7 +581,7 @@ function Sheetsets({ path }) {
         </div>
       </div>
 
-      <ToastContainer 
+      <ToastContainer
         position="bottom-right"
         autoClose={3000}
         hideProgressBar={false}
